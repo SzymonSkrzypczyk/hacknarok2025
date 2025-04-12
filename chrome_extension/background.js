@@ -64,6 +64,13 @@ function toggleIframeVisibility(visible) {
             'datetime'
           );
 
+        const avatarURL =
+          post.childNodes[0]?.childNodes[0]?.childNodes[1].childNodes[0]
+            .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[1].childNodes[0].childNodes[1].childNodes[0]
+            .childNodes[0].childNodes[2].childNodes[0].childNodes[1]
+            .childNodes[0].childNodes[1].src;
+
         const stats = {
           commentsCount: getStat(0),
           likesCount: getStat(2),
@@ -76,6 +83,7 @@ function toggleIframeVisibility(visible) {
           content,
           date,
           link,
+          avatarURL,
           stats,
         };
       } catch (e) {
