@@ -7,12 +7,13 @@ from langchain_core.output_parsers import JsonOutputParser
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from time import perf_counter
 from dotenv import load_dotenv
-from assets.prompts import PROMPT_SUMMARIZER, PROMPT_GET_TAGS
+from assets.prompts import PROMPT_SUMMARIZER, PROMPT_GET_TAGS, PROMPT_SUMMARIZE_BY_TAG
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from assets.db.models import User, Post, Tag
+from assets.db.models import User, Post, Tag, PostTag
+import datetime
 
 load_dotenv()
 
@@ -25,32 +26,61 @@ in order to make sure that Pixel phones remain top contenders in the world of mo
 
 
 
-def get_chain(db_uri: str, user_name: str):
-    engine = create_engine(db_uri)
-    session = sessionmaker(bind=engine)()
+def _get_chain():
+    llm = OpenAI()
+    prompt = PromptTemplate.from_template(PROMPT_SUMMARIZE_BY_TAG)
 
+    return prompt | llm
+
+
+def get_posts_by_tag_for_user(session, user_name) -> dict:
+    """
+    Fetches all the posts for every tag (for the specified user).
+    """
     user = session.query(User).filter(User.name == user_name).first()
     if not user:
         raise ValueError(f"User with name '{user_name}' not found.")
-    user_id = user.id
-    current_tags = session.query(Tag).filter(Tag.user_id == user_id).all()
-    print(list(map(lambda x: x.tag, current_tags)))
-    prompt = PromptTemplate.from_template(PROMPT_GET_TAGS)
-    llm = OpenAI()
-    chain = prompt | llm
+    
+    query = (
+        session.query(Tag.tag, Post.content)
+        .join(PostTag, Tag.id == PostTag.tag_id)
+        .join(Post, Post.id == PostTag.post_id)
+        .filter(Tag.user_id == user.id)
+        .filter(Tag.last_access >= datetime.datetime.now() - datetime.timedelta(hours=12))
+        .order_by(Tag.tag)
+    )
 
-    return chain, current_tags
+    posts_per_tag = {}
+    for tag_name, content in query:
+        if tag_name not in posts_per_tag:
+            posts_per_tag[tag_name] = []
+        posts_per_tag[tag_name].append(content)
+
+    return posts_per_tag
+
+
+def get_summary_per_tags(db_uri: str, user_name: str) -> str:
+    """
+    Creates the summaries for every distinct tag (for the current user) and current session.
+    """
+    engine = create_engine(db_uri)
+    session = sessionmaker(bind=engine)()
+
+    posts_per_tag = get_posts_by_tag_for_user(session, user_name)
+
+    chain = _get_chain()
+
+    response = chain.invoke(
+        {
+            "payload": str(posts_per_tag)
+        }
+    )
+
+    return response
 
 
 if __name__ == "__main__":
     start = perf_counter()
-    # response = invoke_summarizer(TEXT_SAMPLE)
-    chain, tags = get_chain("sqlite:///assets/db/example.db", "Milon")
-    res = chain.invoke(
-        {
-            "content": TEXT_SAMPLE,
-            "tags": tags 
-        }
-    )
-    print(res)
+    response = get_summary_per_tags("sqlite:///example.db", "Milon")
+    print(response)
     print(perf_counter() - start)
