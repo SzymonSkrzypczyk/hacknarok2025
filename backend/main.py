@@ -3,13 +3,13 @@ from datetime import date
 from dotenv import load_dotenv
 from fastapi import FastAPI, Response, Request, status, HTTPException
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel
 
 from post_filter import chain as post_filter_chain
+from fast_check import chain as fact_check_chain
 
 load_dotenv()
-
 app = FastAPI()
 
 
@@ -27,11 +27,12 @@ class Post(BaseModel):
     content: str
     likes: Optional[int] = 0
     reposts: Optional[int] = 0
+    comments: Optional[int] = 0
     link: Optional[str] = None
     categories_applied: List[str] = []
 
 
-class PostResponse(BaseModel):
+class PostFilterResponse(BaseModel):
     """
     Outgoing Post model
 
@@ -46,8 +47,23 @@ class PostResponse(BaseModel):
     likes: Optional[int] = 0
 
 
-@app.post("/post-filter", response_model=PostResponse)
-async def filter_post(post_data: Post) -> PostResponse:
+class PostFactCheckResponse(BaseModel):
+    """
+    Outgoing Post model
+
+    """
+    confidentiality_score: int
+    truthy: bool
+    author: Optional[str] = None
+    date: Optional[Union[str, date]] = None
+    link: Optional[str] = None
+    category: Optional[List[str]] = []
+    reposts: Optional[int] = 0
+    likes: Optional[int] = 0
+
+
+@app.post("/post-filter", response_model=PostFilterResponse)
+async def filter_post(post_data: Post) -> PostFilterResponse:
     """
     Return a list of hashtags based on a content
 
@@ -61,17 +77,17 @@ async def filter_post(post_data: Post) -> PostResponse:
     if not content:
         raise HTTPException(500, "Error in the model response - empty response")
 
-    if "match_percent" not in content or "match_percent" not in content:
+    if "match_percent" not in content or "is_high_match" not in content:
         raise HTTPException(500, "Error in the model response - invalid keys in the response")
 
-    return PostResponse(
+    return PostFilterResponse(
         match_percent=content["match_percent"],
         is_high_match=content["is_high_match"]
     )
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
+async def validation_exception_handler(_request: Request, exc: RequestValidationError):
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={"detail": exc.errors(), "body": exc.body},
@@ -88,6 +104,29 @@ async def get_posts_summary():
     ...
 
 
+@app.post("/post-factcheck")
+async def get_posts_factcheck(post_data: Post):
+    """
+    Fact-check a post
+
+    :return:
+    """
+    content = await fact_check_chain.ainvoke({
+        "content": post_data.content
+    })
+
+    if not content:
+        raise HTTPException(500, "Error in the model response - empty response")
+
+    if "truthy" not in content or "confidentiality_score" not in content:
+        raise HTTPException(500, "Error in the model response - invalid keys in the response")
+
+    return PostFactCheckResponse(
+        confidentiality_score=content["confidentiality_score"],
+        truthy=content["truthy"]
+    )
+
+
 @app.get("/health")
 async def health_check():
     """
@@ -96,6 +135,11 @@ async def health_check():
     :return:
     """
     return Response(status_code=200, content="I'm still standing")
+
+
+@app.get("/")
+async def root():
+    return RedirectResponse(url="/health")
 
 
 if __name__ == "__main__":

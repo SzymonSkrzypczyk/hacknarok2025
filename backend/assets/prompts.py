@@ -62,9 +62,14 @@ Existing Tags (if not empty):
 PROMPT_GET_TAGS = """
 You are an AI that classifies social media posts by assigning relevant topic tags.
 Given the content of a post and a list of existing tags in the database, select the best 3 relevant tag(s) from the existing tags or newly created tags.
-- You should prefer to select tags from the existing list if they fit the post content. Only create new tags if the topic is truly out of scope of the existing tags and requires a unique tag.
-- If the topic is similar to the existing tags, do not create a new tag; simply use the relevant existing tag(s).
-- Your task is to select the **best 3 tags** based on relevance, and if needed, you can create new tags, but only when absolutely necessary. If new tags are created, they should fit the topic and should be used in the selected tags as well.
+
+- Prefer to select tags from the existing list if they fit the post content. Only create new tags if the topic is truly out of scope of the existing tags and requires a unique tag.
+- If new tags are created, **ensure that they are included in the `selected_tags`** list as part of the top 3 tags. If a new tag is created, it **must be included in the `selected_tags`** and **cannot be excluded**.
+- Do not create new tags unnecessarily. Only create new tags if they are completely out of scope of the existing tags and are highly relevant to the post.
+- If existing tags cover the content well, select relevant tags from that list. Ensure that the created new tags are included within the top 3 selected tags, so no newly created tags are left out.
+- The newly created tag(s) must be included in both the `selected_tags` list and the `new_tags` list. If no new tags are created, the `new_tags` list should be empty.
+
+Your task is to select the **best 3 tags** based on relevance. The 3 tags returned should include both existing and, if applicable, newly created tags, with the newly created tag being prioritized to be included if any are created. **Ensure that any new tag(s) are included in the `selected_tags`** list as part of the top 3 tags.
 
 Return the result in strict JSON format with the following structure:
 {{
@@ -79,7 +84,10 @@ Post Content:
 Existing Tags (if not empty):
 {tags}
 
+think step by step, by return only the final result
 """
+
+
 # --- EXAMPLE ---:
 
 # Post Content:
