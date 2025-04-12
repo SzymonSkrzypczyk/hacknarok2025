@@ -21,7 +21,7 @@ You will receive:
    - Unavoidable for proper classification
 
 IF YOU WANT TO CREATE A TAG, FIRST CHECK IF THIS TAG DOESN'T EXIST IN EXISTING TAGS!!! DO NOT USE ABBREVIATIONS!
-DO NOT CREATE TOO MUCH NEW TAGS!
+RETURN MAXIMUM OF 3 TAGS PER POST!!!
 
 
 Return a JSON object where each key is the index of the post, and the value is an object:
@@ -68,6 +68,8 @@ Instructions:
 - Your output must strictly follow the structure provided below.
 - If there are no posts specified, then simply do not return them (in the worst case return an empty json)
 
+ALWAYS RETURN PLAIN TEXT THAT WILL BE EASILY PARSED BY json.loads() FUNCTION!
+
 Return the result in this exact JSON format:
 {{
   "tech": {{
@@ -77,7 +79,8 @@ Return the result in this exact JSON format:
   "smartphones": {{
     "short_summary": "A single concise sentence summarizing all smartphone posts.",
     "brief_summary": "A more detailed 2–4 sentence summary of the smartphone posts."
-  }}
+  }},
+  ...
 }}
 
 Input Example:
@@ -91,10 +94,11 @@ Input Example:
     "post1",
     "post2",
     "post3"
-  ]
+  ],
+  ...
 }}
 
-Output JSON:
+Output Example:
 {{
   "tech": {{
     "short_summary": "...",
@@ -103,7 +107,8 @@ Output JSON:
   "smartphones": {{
     "short_summary": "...",
     "brief_summary": "..."
-  }}
+  }},
+  ...
 }}
 
 THE CONTENT:

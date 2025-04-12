@@ -63,7 +63,7 @@ class Summary(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    tag_id = Column(Integer, ForeignKey("tags.id"), nullable=False)
+    tag = Column(String, ForeignKey("tags.id"), nullable=False)
     short_summary = Column(String, nullable=False)
     long_summary = Column(String, nullable=False)
     date_created = Column(DateTime, nullable=False, default=datetime.now)
