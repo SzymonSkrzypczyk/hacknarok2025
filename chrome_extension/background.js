@@ -18,7 +18,7 @@ function toggleIframeVisibility(visible) {
 
   if (iframe) {
     // Toggle visibility of existing iframe
-    iframe.style.display = visible ? 'block' : 'none';
+    iframe.style.zIndex = visible ? '999999' : '-1';
   } else {
     function scrapXPost(post) {
       try {
@@ -121,14 +121,19 @@ function toggleIframeVisibility(visible) {
         );
       });
 
-      newIframe.contentWindow.addEventListener('message', (event) => {
-        switch (event.data.action) {
+      window.addEventListener('message', (event) => {
+        switch (event.data?.payload?.type) {
           case 'close': {
-            chrome.scripting.executeScript({
-              target: { tabId: tab.id },
-              func: toggleIframeVisibility,
-              args: [iframeVisible],
-            });
+            toggleIframeVisibility(false);
+            break;
+          }
+
+          case 'test': {
+            console.log(
+              'Received test message from iframe!, data:',
+              event.data
+            );
+            break;
           }
         }
       });
