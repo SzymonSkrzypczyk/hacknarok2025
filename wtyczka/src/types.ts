@@ -21,6 +21,6 @@ interface ScrappedXPost {
 }
 
 interface APIRequest {
-  label: string
+  expectedContent: string
   scrappedDataBatch: ScrappedXPost[]
 }
