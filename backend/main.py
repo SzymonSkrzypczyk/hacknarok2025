@@ -4,9 +4,10 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Response, Request, status, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, RedirectResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
-from post_filter import chain as post_filter_chain
+from post_filter_single import chain as post_filter_single_chain
+from post_filter_multiple import chain as post_filter_multiple_chain
 from fast_check import chain as fact_check_chain
 
 load_dotenv()
@@ -47,6 +48,16 @@ class PostFilterResponse(BaseModel):
     likes: Optional[int] = 0
 
 
+class PostList(RootModel[List[Post]]):
+    """Incoming list of posts."""
+    pass
+
+
+class PostFilterListResponse(RootModel[List[PostFilterResponse]]):
+    """Outgoing list of filtered responses."""
+    pass
+
+
 class PostFactCheckResponse(BaseModel):
     """
     Outgoing Post model
@@ -62,14 +73,14 @@ class PostFactCheckResponse(BaseModel):
     likes: Optional[int] = 0
 
 
-@app.post("/post-filter", response_model=PostFilterResponse)
-async def filter_post(post_data: Post) -> PostFilterResponse:
+@app.post("/post-filter-single", response_model=PostFilterResponse)
+async def filter_post_single(post_data: Post) -> PostFilterResponse:
     """
     Return a list of hashtags based on a content
 
     :return:
     """
-    content = await post_filter_chain.ainvoke({
+    content = await post_filter_single_chain.ainvoke({
         "categories_applied": post_data.categories_applied,
         "content": post_data.content
     })
@@ -84,6 +95,26 @@ async def filter_post(post_data: Post) -> PostFilterResponse:
         match_percent=content["match_percent"],
         is_high_match=content["is_high_match"]
     )
+
+
+@app.post("/post-filter-multiple", response_model=PostFilterListResponse)
+async def filter_post_multiple(post_data: PostList) -> PostFilterListResponse:
+    """
+    Return a list of hashtags based on a content
+
+    :return:
+    """
+    content = await post_filter_multiple_chain.ainvoke({
+        "items": post_data
+    })
+
+    if not content:
+        raise HTTPException(500, "Error in the model response - empty response")
+
+    if "match_percent" not in content[0] or "is_high_match" not in content[0]:
+        raise HTTPException(500, "Error in the model response - invalid keys in the response")
+
+    return content
 
 
 @app.exception_handler(RequestValidationError)
