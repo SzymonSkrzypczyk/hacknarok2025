@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Svelte Iframe Injector",
+  "version": "1.0",
+  "description": "Injects and toggles iframe with a Svelte app into web pages.",
+  "permissions": ["scripting"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_icon": "icons/rocket.png"
+  }
+}
