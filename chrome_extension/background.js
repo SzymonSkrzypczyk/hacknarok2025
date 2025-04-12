@@ -1,5 +1,3 @@
-// import { scrapXPost } from './utils';
-
 let iframeVisible = false;
 
 chrome.action.onClicked.addListener((tab) => {
@@ -22,6 +20,69 @@ function toggleIframeVisibility(visible) {
     // Toggle visibility of existing iframe
     iframe.style.display = visible ? 'block' : 'none';
   } else {
+    function scrapXPost(post) {
+      try {
+        function parsePrefix(_value) {
+          if (_value === undefined) return 0;
+
+          const lowercasedValue = _value.toLowerCase();
+          const withoutLastChar = lowercasedValue.slice(
+            0,
+            lowercasedValue.length - 1
+          );
+
+          if (lowercasedValue.endsWith('k')) return withoutLastChar * 1e3;
+          else if (lowercasedValue.endsWith('m')) return withoutLastChar * 1e6;
+          else if (lowercasedValue.endsWith('b')) return withoutLastChar * 1e9;
+
+          return withoutLastChar * 1;
+        }
+
+        function getStat(n) {
+          return parsePrefix(
+            root.childNodes[3]?.childNodes[0]?.childNodes[0]?.childNodes[n]
+              ?.textContent
+          );
+        }
+
+        const root =
+          post.childNodes[0]?.childNodes[0]?.childNodes[1]?.childNodes[1];
+
+        const content = root.childNodes[1].textContent;
+
+        const link =
+          root.childNodes[0]?.childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0]?.childNodes[1].childNodes[0].childNodes[2]
+            .childNodes[0]?.href;
+
+        const author =
+          root.childNodes[0]?.childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0]?.childNodes[0]?.textContent;
+
+        const date =
+          root.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[2].childNodes[0].childNodes[0].getAttribute(
+            'datetime'
+          );
+
+        const stats = {
+          commentsCount: getStat(0),
+          likesCount: getStat(2),
+          viewsCount: getStat(3),
+        };
+
+        return {
+          app: 'X.com',
+          author,
+          content,
+          date,
+          link,
+          stats,
+        };
+      } catch (e) {
+        return 'ADD_DETECTED';
+      }
+    }
+
     // If iframe doesn't exist, create and inject it
     const newIframe = document.createElement('iframe');
     newIframe.src = URL;
@@ -41,14 +102,12 @@ function toggleIframeVisibility(visible) {
 
     newIframe.onload = function () {
       window.addEventListener('scroll', function () {
-        console.log(this.document.querySelectorAll('article'));
-
         newIframe.contentWindow.postMessage(
           {
             action: 'load-posts',
-            // payload: [
-            //   ...this.document.querySelectorAll('article').map(scrapXPost),
-            // ],
+            payload: [...this.document.querySelectorAll('article')]
+              .map(scrapXPost)
+              .filter((post) => post !== 'ADD_DETECTED'),
           },
           '*'
         );

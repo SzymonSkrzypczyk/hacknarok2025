@@ -8,7 +8,7 @@
   let _fetchNodes = $state<() => Node[]>(() => []);
 
   window.addEventListener("message", (event) => {
-    console.log("Received event:", event);
+    console.log(event.data.payload);
 
     if (event.type === "INITIALIZE") {
       isSetup = true;
