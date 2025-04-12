@@ -85,7 +85,7 @@ def process_new_posts(session, user_name: str) -> None:
         session.commit()
 
 
-def get_summaries_for_user(session, user_name: str) -> None:
+def process_summaries(session, user_name: str) -> None:
     """
     KOMBAJN AFRYKANSKI!!!
     """

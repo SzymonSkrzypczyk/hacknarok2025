@@ -121,7 +121,7 @@ async def validation_exception_handler(_request: Request, exc: RequestValidation
 @app.post("/posts-summary")
 async def get_posts_summary(user_session: UserSession) -> SessionSummaryResponse:
     """
-    Summarize a batch of posts
+    Get current summaries for the user session.
 
     :return:
     """
@@ -132,7 +132,7 @@ async def get_posts_summary(user_session: UserSession) -> SessionSummaryResponse
 
     results = session.query(Summary).filter(
             Summary.user_id == user.id \
-        and Summary.date_created >= datetime.datetime.now() - datetime.timedelta(hours=12))
+        and Summary.date_created >= datetime.datetime.now() - datetime.timedelta(hours=24))
     
     return results.all()
 
@@ -141,25 +141,8 @@ async def get_posts_tag(user_session: UserSession):
     engine = create_engine(DATABASE_URI)
     session = sessionmaker(bind=engine)()
 
-    payload = get_posts_by_tag_for_user(session, user_session.user_name)
-    content = await summarize_chain.ainvoke({
-        "payload": payload
-    })
-
-    try:
-        content = json.loads(content)
-    except json.JSONDecodeError:
-        raise HTTPException(500, "Error in the model response - invalid JSON format")
-    
-    if not content:
-        raise HTTPException(500, "Error in the model response - empty response")
-
-    return SessionSummaryResponse(
-        summaries=content
-    )
-
-
-
+    process_new_posts(session, user_session.user_name)
+    process_summaries(session, user_session.user_name)
 
 
 
