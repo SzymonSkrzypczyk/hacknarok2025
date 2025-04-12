@@ -19,3 +19,8 @@ interface ScrappedXPost {
     commentsCount: number
   }
 }
+
+interface APIRequest {
+  label: string
+  scrappedDataBatch: ScrappedXPost[]
+}
