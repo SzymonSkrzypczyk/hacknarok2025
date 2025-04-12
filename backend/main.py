@@ -5,9 +5,10 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Response
 from pydantic import BaseModel
 
+from post_filter import chain as post_filter_chain
+
 load_dotenv()
 
-OPENAI_TOKEN = environ["OPENAI_TOKEN"]
 app = FastAPI()
 
 
@@ -25,6 +26,7 @@ class Post(BaseModel):
     content: str
     likes: int
     reposts: int
+    categories_applied: List[str] = []
 
 
 class PostResponse(BaseModel):
@@ -36,17 +38,24 @@ class PostResponse(BaseModel):
     summary: Optional[str] = None
 
 
-@app.get("/post-filter", response_model=PostResponse)
+@app.post("/post-filter", response_model=PostResponse)
 async def filter_post(post_data: Post) -> PostResponse:
     """
     Return a list of hashtags based on a content
 
     :return:
     """
-    ...
+    content = await post_filter_chain.ainvoke({
+        "categories_applied": post_data.categories_applied,
+        "content": post_data.content
+    })
+
+    return PostResponse(
+        category=content
+    )
 
 
-@app.get("/posts-summary")
+@app.post("/posts-summary")
 async def get_posts_summary():
     """
     Summarize a batch of posts
