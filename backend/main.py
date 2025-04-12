@@ -6,8 +6,16 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel
 
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+
 from post_filter import chain as post_filter_chain
 from fast_check import chain as fact_check_chain
+from summarizer import chain as summarize_chain
+from tagger import chain as tag_chain
+
+from utils import *
+import json
 
 load_dotenv()
 app = FastAPI()
@@ -31,6 +39,22 @@ class Post(BaseModel):
     link: Optional[str] = None
     categories_applied: List[str] = []
 
+
+class UserSession(BaseModel):
+    """
+    Incoming User Model
+
+    :param user_name: User Name
+    # date of session start (tbd)
+    """
+    user_name: str
+
+class SessionSummaryResponse(BaseModel):
+    """
+    Outgoing Session summary model
+
+    """
+    summaries: dict
 
 class PostFilterResponse(BaseModel):
     """
@@ -95,13 +119,48 @@ async def validation_exception_handler(_request: Request, exc: RequestValidation
 
 
 @app.post("/posts-summary")
-async def get_posts_summary():
+async def get_posts_summary(user_session: UserSession) -> SessionSummaryResponse:
     """
     Summarize a batch of posts
 
     :return:
     """
-    ...
+    engine = create_engine(DATABASE_URI)
+    session = sessionmaker(bind=engine)()
+
+    user = session.query(User).filter(User.name == user_session.user_name)
+
+    results = session.query(Summary).filter(
+            Summary.user_id == user.id \
+        and Summary.date_created >= datetime.datetime.now() - datetime.timedelta(hours=12))
+    
+    
+
+@app.post("/trigger-processing")
+async def get_posts_tag(user_session: UserSession):
+    engine = create_engine(DATABASE_URI)
+    session = sessionmaker(bind=engine)()
+
+    payload = get_posts_by_tag_for_user(session, user_session.user_name)
+    content = await summarize_chain.ainvoke({
+        "payload": payload
+    })
+
+    try:
+        content = json.loads(content)
+    except json.JSONDecodeError:
+        raise HTTPException(500, "Error in the model response - invalid JSON format")
+    
+    if not content:
+        raise HTTPException(500, "Error in the model response - empty response")
+
+    return SessionSummaryResponse(
+        summaries=content
+    )
+
+
+
+
 
 
 @app.post("/post-factcheck")

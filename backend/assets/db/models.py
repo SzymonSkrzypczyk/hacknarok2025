@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey, ForeignKeyConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
+from datetime import datetime
 
 DATABASE_URL = "sqlite:///example.db"
 engine = create_engine(DATABASE_URL, echo=True)
@@ -15,6 +16,7 @@ class User(Base):
     
     tags = relationship("Tag", back_populates="user")
     posts = relationship("Post", back_populates="user")
+    # summaries = relationship("Summary", back_populates="user")
 
 class Post(Base):
     __tablename__ = "posts"
@@ -55,6 +57,18 @@ class PostTag(Base):
         ForeignKeyConstraint(['post_id'], ['posts.id']),
         ForeignKeyConstraint(['tag_id'], ['tags.id']),
     )
+
+class Summary(Base):
+    __tablename__ = "summaries"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    tag_id = Column(Integer, ForeignKey("tags.id"), nullable=False)
+    short_summary = Column(String, nullable=False)
+    long_summary = Column(String, nullable=False)
+    date_created = Column(DateTime, nullable=False, default=datetime.now)
+
+    
 
 
 if __name__ == "__main__":
