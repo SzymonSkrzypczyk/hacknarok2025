@@ -11,7 +11,7 @@ posts = [
     "Reflecting on the importance of mental health. It's crucial to take time for yourself, practice mindfulness, and seek help when needed. Let's break the stigma and support one another."
 ]
 
-already_existing_tags = ["tech", "coffee"]
+already_existing_tags = ["technology", "coffee"]
 
 load_dotenv()
 

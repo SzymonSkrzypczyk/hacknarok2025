@@ -20,23 +20,25 @@ You will receive:
    - Not already captured by the existing tags
    - Unavoidable for proper classification
 
-## OUTPUT FORMAT:
+IF YOU WANT TO CREATE A TAG, FIRST CHECK IF THIS TAG DOESN'T EXIST IN EXISTING TAGS!!! DO NOT USE ABBREVIATIONS!
+DO NOT CREATE TOO MUCH NEW TAGS!
+
 
 Return a JSON object where each key is the index of the post, and the value is an object:
+RETURN ONLY THE JSON IN PLAIN TEXT AND NOTHING ELSE SO IT'S READY TO BE CONVERTED TO DICTIONARY
 
+OUTPUT FORMAT:
 ```json
 {{
   "1": {{
-    "matched_tags": [...],
-    "new_tags": [...]
+    "matched_tags": [...]
   }},
   "2": {{
-    "matched_tags": [...],
-    "new_tags": [...]
+    "matched_tags": [...]
   }}
   ...
 }}
-
+```
 POSTS:
 
 {posts}

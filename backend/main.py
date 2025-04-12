@@ -134,7 +134,7 @@ async def get_posts_summary(user_session: UserSession) -> SessionSummaryResponse
             Summary.user_id == user.id \
         and Summary.date_created >= datetime.datetime.now() - datetime.timedelta(hours=12))
     
-    
+    return results.all()
 
 @app.post("/trigger-processing")
 async def get_posts_tag(user_session: UserSession):
