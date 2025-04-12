@@ -33,23 +33,24 @@ def get_chain(db_uri: str, user_name: str):
     if not user:
         raise ValueError(f"User with name '{user_name}' not found.")
     user_id = user.id
-    current_tags = session.query(Post).filter(Post.user_id == user_id).all()
+    current_tags = session.query(Tag).filter(Tag.user_id == user_id).all()
     print(list(map(lambda x: x.tag, current_tags)))
-    # prompt = PromptTemplate.from_template(PROMPT_SUMMARIZER)
-    # llm = OpenAI()
-    # chain = prompt | llm
+    prompt = PromptTemplate.from_template(PROMPT_GET_TAGS)
+    llm = OpenAI()
+    chain = prompt | llm
 
-    # return chain
+    return chain, current_tags
 
 
 if __name__ == "__main__":
     start = perf_counter()
     # response = invoke_summarizer(TEXT_SAMPLE)
-    chain = get_chain("sqlite:///example.db", "Milon")
-    # res = chain.invoke(
-    #     {
-    #         "content": TEXT_SAMPLE,
-    #     }
-    # )
-    # print(res)
+    chain, tags = get_chain("sqlite:///assets/db/example.db", "Milon")
+    res = chain.invoke(
+        {
+            "content": TEXT_SAMPLE,
+            "tags": tags 
+        }
+    )
+    print(res)
     print(perf_counter() - start)
