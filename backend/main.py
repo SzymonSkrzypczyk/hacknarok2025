@@ -8,7 +8,8 @@ from pydantic import BaseModel, RootModel
 
 from post_filter_single import chain as post_filter_single_chain
 from post_filter_multiple import chain as post_filter_multiple_chain
-from fast_check import chain as fact_check_chain
+from fact_check_single import chain as fact_check_single_chain
+from fact_check_multiple import chain as fact_check_multiple_chain
 
 load_dotenv()
 app = FastAPI()
@@ -73,6 +74,11 @@ class PostFactCheckResponse(BaseModel):
     likes: Optional[int] = 0
 
 
+class PostFactCheckListResponse(RootModel[List[PostFactCheckResponse]]):
+    """Outgoing list of filtered responses."""
+    pass
+
+
 @app.post("/post-filter-single", response_model=PostFilterResponse)
 async def filter_post_single(post_data: Post) -> PostFilterResponse:
     """
@@ -135,14 +141,14 @@ async def get_posts_summary():
     ...
 
 
-@app.post("/post-factcheck")
-async def get_posts_factcheck(post_data: Post):
+@app.post("/post-factcheck-single", response_model=PostFactCheckResponse)
+async def get_posts_factcheck_single(post_data: Post) -> PostFactCheckResponse:
     """
     Fact-check a post
 
     :return:
     """
-    content = await fact_check_chain.ainvoke({
+    content = await fact_check_single_chain.ainvoke({
         "content": post_data.content
     })
 
@@ -155,6 +161,33 @@ async def get_posts_factcheck(post_data: Post):
     return PostFactCheckResponse(
         confidentiality_score=content["confidentiality_score"],
         truthy=content["truthy"]
+    )
+
+
+@app.post("/post-factcheck-multiple", response_model=PostFactCheckListResponse)
+async def get_posts_factcheck_multiple(post_data: PostList) -> PostFactCheckListResponse:
+    """
+    Fact-check a post
+
+    :return:
+    """
+    content = await fact_check_multiple_chain.ainvoke({
+        "items": post_data
+    })
+
+    if not content:
+        raise HTTPException(500, "Error in the model response - empty response")
+
+    if "truthy" not in content[0] or "confidentiality_score" not in content[0]:
+        raise HTTPException(500, "Error in the model response - invalid keys in the response")
+
+    return PostFactCheckListResponse(
+        [PostFactCheckResponse(
+            confidentiality_score=post["confidentiality_score"],
+            truthy=post["truthy"]
+        )
+            for post in content
+        ]
     )
 
 
@@ -175,4 +208,5 @@ async def root():
 
 if __name__ == "__main__":
     from uvicorn import run
+
     run(app, port=8888)
