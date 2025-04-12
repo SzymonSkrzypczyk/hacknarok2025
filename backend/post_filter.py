@@ -11,19 +11,28 @@ OPENAI_API_KEY = environ["OPENAI_API_KEY"]
 PROMPT = PromptTemplate.from_template("""
 You are a content classification assistant.
 
-Your task is to analyze the content of a blog post or article and select the most relevant categories **only from the list provided** that best describe the main topics discussed.
+Your task is to analyze the content of a blog post or article and identify which categories it fits into from a general knowledge perspective.
 
-Only return categories that are clearly relevant to the post. Use **only** the categories from the list. Return your answer as a **valid JSON array of double-quoted strings** and nothing else.
+Then compare your identified categories with the **provided list of expected categories**, and return:
+1. The **percentage** of how many expected categories are actually matched (rounded to the nearest whole number).
+2. A **boolean** indicating whether the match is 70% or higher.
 
-Allowed categories:
+Only consider categories from the expected list when evaluating the match.
+
+Expected categories:
 {categories_applied}
 
 Post content:
 {content}
 
 | Output Format |
-Valid JSON array of strings. Example:
-["Technology", "AI"]
+Return **only** a valid JSON object and nothing else — no explanations, no markdown, no extra formatting.
+
+Example:
+{{
+  "match_percent": 80,
+  "is_high_match": true
+}}
 """)
 openai_model = OpenAI(
     openai_api_key=OPENAI_API_KEY,

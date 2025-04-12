@@ -1,8 +1,9 @@
-from os import environ
 from typing import List, Union, Optional
 from datetime import date
 from dotenv import load_dotenv
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, Request, status, HTTPException
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from post_filter import chain as post_filter_chain
@@ -21,11 +22,12 @@ class Post(BaseModel):
     :param content: Content of the post
     :param likes: Number of likes
     """
-    author: str
-    date: Union[str, date]
+    author: Optional[str] = None
+    date: Optional[Union[str, date]] = None
     content: str
-    likes: int
-    reposts: int
+    likes: Optional[int] = 0
+    reposts: Optional[int] = 0
+    link: Optional[str] = None
     categories_applied: List[str] = []
 
 
@@ -34,8 +36,14 @@ class PostResponse(BaseModel):
     Outgoing Post model
 
     """
-    category: List[str]
-    summary: Optional[str] = None
+    match_percent: int
+    is_high_match: bool
+    author: Optional[str] = None
+    date: Optional[Union[str, date]] = None
+    link: Optional[str] = None
+    category: Optional[List[str]] = []
+    reposts: Optional[int] = 0
+    likes: Optional[int] = 0
 
 
 @app.post("/post-filter", response_model=PostResponse)
@@ -50,8 +58,23 @@ async def filter_post(post_data: Post) -> PostResponse:
         "content": post_data.content
     })
 
+    if not content:
+        raise HTTPException(500, "Error in the model response - empty response")
+
+    if "match_percent" not in content or "match_percent" not in content:
+        raise HTTPException(500, "Error in the model response - invalid keys in the response")
+
     return PostResponse(
-        category=content
+        match_percent=content["match_percent"],
+        is_high_match=content["is_high_match"]
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"detail": exc.errors(), "body": exc.body},
     )
 
 
@@ -77,4 +100,4 @@ async def health_check():
 
 if __name__ == "__main__":
     from uvicorn import run
-    run(app, host="0.0.0.0", port=8888)
+    run(app, port=8888)
