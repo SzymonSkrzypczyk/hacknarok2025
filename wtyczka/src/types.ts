@@ -1,4 +1,4 @@
-interface ScrappedData {
+interface ScrappedXPost {
   app: string
 
   /** Fullname */
@@ -10,6 +10,8 @@ interface ScrappedData {
   content: string
 
   link: string
+
+  avatarURL: string
 
   stats: {
     likesCount: number
