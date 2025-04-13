@@ -1,11 +1,10 @@
 from typing import List, Union, Optional
 from datetime import date
 from dotenv import load_dotenv
-
 from fastapi import FastAPI, Response, Request, status, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, RedirectResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
@@ -14,7 +13,7 @@ from post_filter import chain as post_filter_chain
 from fast_check import chain as fact_check_chain
 from summarizer import chain as summarize_chain
 from tagger import chain as tag_chain
-from logger import logger
+from logger import logger, log_config
 
 from utils import *
 import json
@@ -58,6 +57,22 @@ class ResponseModel(BaseModel):
     category: Optional[List[str]] = []
     reposts: Optional[int] = 0
     likes: Optional[int] = 0
+
+class UserSession(BaseModel):
+    """
+    Incoming User Model
+
+    :param user_name: User Name
+    # date of session start (tbd)
+    """
+    user_name: str
+
+class SessionSummaryResponse(BaseModel):
+    """
+    Outgoing Session summary model
+
+    """
+    summaries: List[dict]
 
 
 class ResponseModelList(RootModel[List[ResponseModel]]):
@@ -131,28 +146,6 @@ async def get_posts_tag(user_session: UserSession):
     return 200
 
 
-@app.post("/post-factcheck")
-async def get_posts_factcheck(post_data: Post):
-    """
-    Fact-check a post
-
-    :return:
-    """
-    content = await fact_check_chain.ainvoke({
-        "content": post_data.content
-    })
-
-    if not content:
-        raise HTTPException(500, "Error in the model response - empty response")
-
-    if "truthy" not in content or "confidentiality_score" not in content:
-        raise HTTPException(500, "Error in the model response - invalid keys in the response")
-
-    return PostFactCheckResponse(
-        confidentiality_score=content["confidentiality_score"],
-        truthy=content["truthy"]
-    )
-
 
 @app.post("/post-factcheck-multiple", response_model=ResponseModelList)
 async def get_posts_factcheck_multiple(post_data: APIRequest) -> ResponseModelList:
@@ -202,4 +195,5 @@ async def root():
 
 if __name__ == "__main__":
     from uvicorn import run
+
     run(app, port=8888, log_config=log_config)
