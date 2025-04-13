@@ -14,6 +14,9 @@ class User(Base):
     name = Column(String, nullable=False)
     age = Column(Integer, nullable=False)
 
+    tags = relationship("Tag", back_populates="user")
+    posts = relationship("Post", back_populates="user")
+
 class Post(Base):
     __tablename__ = "posts"
     
