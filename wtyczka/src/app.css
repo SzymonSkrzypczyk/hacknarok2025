@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body,
+#app,
+main {
+  @apply h-full;
+}
+
+main {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 1rem;
+  gap: 1rem;
+  box-sizing: border-box;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

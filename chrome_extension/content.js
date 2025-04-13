@@ -2,6 +2,9 @@
   const IFRAME_ID = 'hacknarock-2025-widget';
   const URL = 'http://localhost:5173/';
 
+  const WIDTH = '400px';
+  const HEIGHT = '640px';
+
   // 1. Validate if iframe already exists
   if (document.getElementById(IFRAME_ID)) return;
   // ---
@@ -84,8 +87,8 @@
   iframe.style.position = 'fixed';
   iframe.style.bottom = '10px';
   iframe.style.right = '10px';
-  iframe.style.width = '400px';
-  iframe.style.height = '300px';
+  iframe.style.width = WIDTH;
+  iframe.style.height = HEIGHT;
   iframe.style.zIndex = '9999';
   iframe.style.border = 'none';
   iframe.style.boxShadow = '0 0 12px rgba(0,0,0,0.3)';
@@ -97,6 +100,8 @@
 
     iframe.dataset.opened = isCurrentlyVisible ? '0' : '1';
     iframe.style.zIndex = isCurrentlyVisible ? '-1' : '9999';
+    iframe.style.width = isCurrentlyVisible ? '0' : WIDTH;
+    iframe.style.height = isCurrentlyVisible ? '0' : HEIGHT;
   };
 
   iframe.onload = function () {
