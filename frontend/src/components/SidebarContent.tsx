@@ -52,7 +52,6 @@ export function SidebarContent() {
         facebook: Facebook,
         instagram: Instagram,
         linkedin: Linkedin,
-        reddit: MessageCircle,
     };
 
     // Get runic symbols for buttons
@@ -127,29 +126,24 @@ export function SidebarContent() {
                     <nav className="space-y-1 mt-1">
                         {[
                             {
-                                name: "Twitter",
+                                name: "Huginn / X",
                                 platform: "twitter" as SocialPlatform,
                                 active: availablePlatforms.includes("twitter"),
                             },
                             {
-                                name: "Facebook",
+                                name: "Odyn / Facebook",
                                 platform: "facebook" as SocialPlatform,
                                 active: availablePlatforms.includes("facebook"),
                             },
                             {
-                                name: "Instagram",
+                                name: "Thor / Instagram",
                                 platform: "instagram" as SocialPlatform,
                                 active: availablePlatforms.includes("instagram"),
                             },
                             {
-                                name: "LinkedIn",
+                                name: "Loki / LinkedIn",
                                 platform: "linkedin" as SocialPlatform,
                                 active: availablePlatforms.includes("linkedin"),
-                            },
-                            {
-                                name: "Reddit",
-                                platform: "reddit" as SocialPlatform,
-                                active: availablePlatforms.includes("reddit"),
                             },
                         ].map((platformItem) => {
                             const PlatformIcon = platformIcons[platformItem.platform];
