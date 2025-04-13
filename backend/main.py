@@ -1,6 +1,7 @@
 from typing import List, Union, Optional
 from datetime import date
 from dotenv import load_dotenv
+
 from fastapi import FastAPI, Response, Request, status, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -13,6 +14,7 @@ from post_filter import chain as post_filter_chain
 from fast_check import chain as fact_check_chain
 from summarizer import chain as summarize_chain
 from tagger import chain as tag_chain
+from logger import logger
 
 from utils import *
 import json
@@ -21,57 +23,29 @@ load_dotenv()
 app = FastAPI()
 
 
-class Post(BaseModel):
-    """
-    Incoming Post model
+class Stats(BaseModel):
+    likesCount: int
+    viewsCount: int
+    commentsCount: int
 
-    :param author: Author of the post
-    :param date: Date of the post
-    :param content: Content of the post
-    :param likes: Number of likes
-    """
-    author: Optional[str] = None
-    date: Optional[Union[str, date]] = None
+
+class ScrappedXPost(BaseModel):
+    app: str
+    accountName: str
+    date: str
     content: str
-    likes: Optional[int] = 0
-    reposts: Optional[int] = 0
-    comments: Optional[int] = 0
-    link: Optional[str] = None
-    categories_applied: List[str] = []
+    link: str
+    avatarURL: str
+
+    stats: Stats
 
 
-class UserSession(BaseModel):
-    """
-    Incoming User Model
-
-    :param user_name: User Name
-    # date of session start (tbd)
-    """
-    user_name: str
-
-class SessionSummaryResponse(BaseModel):
-    """
-    Outgoing Session summary model
-
-    """
-    summaries: List[dict]
-
-class PostFilterResponse(BaseModel):
-    """
-    Outgoing Post model
-
-    """
-    match_percent: int
-    is_high_match: bool
-    author: Optional[str] = None
-    date: Optional[Union[str, date]] = None
-    link: Optional[str] = None
-    category: Optional[List[str]] = []
-    reposts: Optional[int] = 0
-    likes: Optional[int] = 0
+class APIRequest(BaseModel):
+    expectedContent: List[str]
+    scrappedDataBatch: List[ScrappedXPost]
 
 
-class PostFactCheckResponse(BaseModel):
+class ResponseModel(BaseModel):
     """
     Outgoing Post model
 
@@ -86,32 +60,38 @@ class PostFactCheckResponse(BaseModel):
     likes: Optional[int] = 0
 
 
-@app.post("/post-filter", response_model=PostFilterResponse)
-async def filter_post(post_data: Post) -> PostFilterResponse:
+class ResponseModelList(RootModel[List[ResponseModel]]):
+    """Outgoing list of filtered responses."""
+    pass
+
+
+@app.post("/post-filter-multiple", response_model=ResponseModelList)
+async def filter_post_multiple(post_data: APIRequest) -> ResponseModelList:
     """
     Return a list of hashtags based on a content
 
     :return:
     """
+    logger.info("Filtering multiple posts")
     content = await post_filter_chain.ainvoke({
-        "categories_applied": post_data.categories_applied,
-        "content": post_data.content
+        "items": [post.content for post in post_data.scrappedDataBatch],
+        "expected_categories": post_data.expectedContent
     })
 
     if not content:
+        logger.error("Empty response from model - filtering multiple")
         raise HTTPException(500, "Error in the model response - empty response")
 
-    if "match_percent" not in content or "is_high_match" not in content:
+    if "confidentiality_score" not in content[0] or "truthy" not in content[0]:
+        logger.error("Invalid response keys: %s - filtering multiple", content[0].keys())
         raise HTTPException(500, "Error in the model response - invalid keys in the response")
 
-    return PostFilterResponse(
-        match_percent=content["match_percent"],
-        is_high_match=content["is_high_match"]
-    )
+    return content
 
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(_request: Request, exc: RequestValidationError):
+    logger.error("Validation error: %s", exc.errors())
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={"detail": exc.errors(), "body": exc.body},
@@ -174,6 +154,37 @@ async def get_posts_factcheck(post_data: Post):
     )
 
 
+@app.post("/post-factcheck-multiple", response_model=ResponseModelList)
+async def get_posts_factcheck_multiple(post_data: APIRequest) -> ResponseModelList:
+    """
+    Fact-check a post
+
+    :return:
+    """
+    logger.info("Fact-checking multiple posts")
+    content = await fact_check_chain.ainvoke({
+        "items": [post.content for post in post_data.scrappedDataBatch],
+        "expected_categories": post_data.expectedContent
+    })
+
+    if not content:
+        logger.error("Empty response from model - fact-checking multiple")
+        raise HTTPException(500, "Error in the model response - empty response")
+
+    if "truthy" not in content[0] or "confidentiality_score" not in content[0]:
+        logger.error("Invalid response keys: %s - fact-checking multiple", content[0].keys())
+        raise HTTPException(500, "Error in the model response - invalid keys in the response")
+
+    return ResponseModelList(
+        [ResponseModel(
+            confidentiality_score=post["confidentiality_score"],
+            truthy=post["truthy"]
+        )
+            for post in content
+        ]
+    )
+
+
 @app.get("/health")
 async def health_check():
     """
@@ -191,4 +202,4 @@ async def root():
 
 if __name__ == "__main__":
     from uvicorn import run
-    run(app, port=8888)
+    run(app, port=8888, log_config=log_config)

@@ -9,18 +9,14 @@ Base = declarative_base()
 
 class User(Base):
     __tablename__ = 'users'
-    
+
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     age = Column(Integer, nullable=False)
-    
-    tags = relationship("Tag", back_populates="user")
-    posts = relationship("Post", back_populates="user")
-    # summaries = relationship("Summary", back_populates="user")
 
 class Post(Base):
     __tablename__ = "posts"
-        
+    
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     app_type = Column(String, nullable=False)

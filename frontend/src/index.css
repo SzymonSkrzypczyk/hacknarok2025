@@ -1,0 +1,953 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        /* Default theme - Midgard (White) */
+        --background: 0 0% 100%;
+        --foreground: 240 10% 3.9%;
+        --card: 0 0% 100%;
+        --card-foreground: 240 10% 3.9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 240 10% 3.9%;
+        --primary: 240 5.9% 10%;
+        --primary-foreground: 0 0% 98%;
+        --secondary: 240 4.8% 95.9%;
+        --secondary-foreground: 240 5.9% 10%;
+        --muted: 240 4.8% 95.9%;
+        --muted-foreground: 240 3.8% 46.1%;
+        --accent: 240 4.8% 95.9%;
+        --accent-foreground: 240 5.9% 10%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 240 5.9% 90%;
+        --input: 240 5.9% 90%;
+        --ring: 240 5.9% 10%;
+        --radius: 0.75rem;
+
+        --sidebar-background: 0 0% 100%;
+        --sidebar-foreground: 240 5.3% 26.1%;
+        --sidebar-primary: 240 5.9% 10%;
+        --sidebar-primary-foreground: 0 0% 98%;
+        --sidebar-accent: 240 4.8% 95.9%;
+        --sidebar-accent-foreground: 240 5.9% 10%;
+        --sidebar-border: 220 13% 91%;
+        --sidebar-ring: 217.2 91.2% 59.8%;
+
+        /* Chart colors */
+        --chart-primary: 240 5.9% 10%;
+        --chart-secondary: 240 4.8% 95.9%;
+        --chart-accent: 240 3.8% 46.1%;
+        --chart-muted: 240 4.8% 85%;
+        --chart-background: 0 0% 100%;
+
+        /* Chart series colors */
+        --chart-series-1: 240 5.9% 10%;
+        --chart-series-2: 240 5% 64%;
+        --chart-series-3: 240 5% 34%;
+        --chart-series-4: 240 5% 84%;
+        --chart-series-5: 240 5% 54%;
+    }
+
+    .dark {
+        --background: 240 10% 3.9%;
+        --foreground: 0 0% 98%;
+        --card: 240 10% 3.9%;
+        --card-foreground: 0 0% 98%;
+        --popover: 240 10% 3.9%;
+        --popover-foreground: 0 0% 98%;
+        --primary: 0 0% 98%;
+        --primary-foreground: 240 5.9% 10%;
+        --secondary: 240 3.7% 15.9%;
+        --secondary-foreground: 0 0% 98%;
+        --muted: 240 3.7% 15.9%;
+        --muted-foreground: 240 5% 64.9%;
+        --accent: 240 3.7% 15.9%;
+        --accent-foreground: 0 0% 98%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 240 3.7% 15.9%;
+        --input: 240 3.7% 15.9%;
+        --ring: 240 4.9% 83.9%;
+
+        --sidebar-background: 240 10% 3.9%;
+        --sidebar-foreground: 0 0% 70%;
+        --sidebar-primary: 0 0% 98%;
+        --sidebar-primary-foreground: 240 5.9% 10%;
+        --sidebar-accent: 240 3.7% 15.9%;
+        --sidebar-accent-foreground: 0 0% 98%;
+        --sidebar-border: 240 3.7% 15.9%;
+        --sidebar-ring: 240 4.9% 83.9%;
+
+        /* Chart colors */
+        --chart-primary: 0 0% 98%;
+        --chart-secondary: 240 3.7% 15.9%;
+        --chart-accent: 240 5% 64.9%;
+        --chart-muted: 240 3.7% 25%;
+        --chart-background: 240 10% 3.9%;
+
+        /* Chart series colors */
+        --chart-series-1: 0 0% 98%;
+        --chart-series-2: 0 0% 80%;
+        --chart-series-3: 0 0% 60%;
+        --chart-series-4: 0 0% 40%;
+        --chart-series-5: 0 0% 70%;
+    }
+
+    .theme-alfheim {
+        /* Alfheim (Light Blue): Indigo */
+        --background: 0 0% 100%;
+        --foreground: 226 70% 20%;
+        --card: 0 0% 100%;
+        --card-foreground: 226 70% 20%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 226 70% 20%;
+        --primary: 226 100% 58%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 226 30% 92%;
+        --secondary-foreground: 226 70% 40%;
+        --muted: 226 30% 92%;
+        --muted-foreground: 226 30% 40%;
+        --accent: 226 30% 92%;
+        --accent-foreground: 226 70% 40%;
+        --destructive: 0 84% 60%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 226 30% 92%;
+        --input: 226 30% 92%;
+        --ring: 226 100% 58%;
+
+        --sidebar-background: 0 0% 100%;
+        --sidebar-foreground: 226 70% 40%;
+        --sidebar-primary: 226 100% 58%;
+        --sidebar-primary-foreground: 0 0% 100%;
+        --sidebar-accent: 226 30% 92%;
+        --sidebar-accent-foreground: 226 70% 40%;
+        --sidebar-border: 226 30% 92%;
+        --sidebar-ring: 226 100% 58%;
+
+        /* Chart colors */
+        --chart-primary: 226 100% 58%;
+        --chart-secondary: 226 30% 92%;
+        --chart-accent: 226 30% 40%;
+        --chart-muted: 226 30% 88%;
+        --chart-background: 0 0% 100%;
+
+        /* Chart series colors */
+        --chart-series-1: 226 100% 58%;
+        --chart-series-2: 226 80% 70%;
+        --chart-series-3: 226 70% 40%;
+        --chart-series-4: 226 90% 80%;
+        --chart-series-5: 226 60% 50%;
+    }
+
+    .dark.theme-alfheim {
+        --background: 226 70% 10%;
+        --foreground: 226 100% 90%;
+        --card: 226 70% 12%;
+        --card-foreground: 226 100% 90%;
+        --popover: 226 70% 12%;
+        --popover-foreground: 226 100% 90%;
+        --primary: 226 100% 58%;
+        --primary-foreground: 226 100% 98%;
+        --secondary: 226 70% 20%;
+        --secondary-foreground: 226 100% 90%;
+        --muted: 226 70% 20%;
+        --muted-foreground: 226 50% 70%;
+        --accent: 226 70% 20%;
+        --accent-foreground: 226 100% 90%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 226 70% 20%;
+        --input: 226 70% 20%;
+        --ring: 226 100% 58%;
+
+        --sidebar-background: 226 70% 10%;
+        --sidebar-foreground: 226 50% 70%;
+        --sidebar-primary: 226 100% 58%;
+        --sidebar-primary-foreground: 226 100% 98%;
+        --sidebar-accent: 226 70% 20%;
+        --sidebar-accent-foreground: 226 100% 90%;
+        --sidebar-border: 226 70% 20%;
+        --sidebar-ring: 226 100% 58%;
+
+        /* Chart colors */
+        --chart-primary: 226 100% 58%;
+        --chart-secondary: 226 70% 20%;
+        --chart-accent: 226 50% 70%;
+        --chart-muted: 226 70% 30%;
+        --chart-background: 226 70% 10%;
+
+        /* Chart series colors */
+        --chart-series-1: 226 100% 58%;
+        --chart-series-2: 226 100% 72%;
+        --chart-series-3: 226 100% 86%;
+        --chart-series-4: 226 80% 65%;
+        --chart-series-5: 226 90% 80%;
+    }
+
+    .theme-asgard {
+        /* Asgard (Gray): Zinc */
+        --background: 0 0% 100%;
+        --foreground: 240 10% 3.9%;
+        --card: 0 0% 100%;
+        --card-foreground: 240 10% 3.9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 240 10% 3.9%;
+        --primary: 240 5% 45%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 240 5% 90%;
+        --secondary-foreground: 240 5% 30%;
+        --muted: 240 5% 90%;
+        --muted-foreground: 240 5% 40%;
+        --accent: 240 5% 90%;
+        --accent-foreground: 240 5% 30%;
+        --destructive: 0 84% 60%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 240 5% 88%;
+        --input: 240 5% 88%;
+        --ring: 240 5% 45%;
+
+        --sidebar-background: 0 0% 100%;
+        --sidebar-foreground: 240 5% 40%;
+        --sidebar-primary: 240 5% 45%;
+        --sidebar-primary-foreground: 0 0% 100%;
+        --sidebar-accent: 240 5% 90%;
+        --sidebar-accent-foreground: 240 5% 30%;
+        --sidebar-border: 240 5% 88%;
+        --sidebar-ring: 240 5% 45%;
+
+        /* Chart colors */
+        --chart-primary: 240 5% 45%;
+        --chart-secondary: 240 5% 90%;
+        --chart-accent: 240 5% 40%;
+        --chart-muted: 240 5% 85%;
+        --chart-background: 0 0% 100%;
+
+        /* Chart series colors */
+        --chart-series-1: 240 5% 45%;
+        --chart-series-2: 240 5% 65%;
+        --chart-series-3: 240 5% 35%;
+        --chart-series-4: 240 5% 75%;
+        --chart-series-5: 240 5% 55%;
+    }
+
+    .dark.theme-asgard {
+        --background: 240 5% 10%;
+        --foreground: 240 5% 95%;
+        --card: 240 5% 12%;
+        --card-foreground: 240 5% 95%;
+        --popover: 240 5% 12%;
+        --popover-foreground: 240 5% 95%;
+        --primary: 240 5% 65%;
+        --primary-foreground: 240 5% 10%;
+        --secondary: 240 5% 25%;
+        --secondary-foreground: 240 5% 95%;
+        --muted: 240 5% 25%;
+        --muted-foreground: 240 5% 65%;
+        --accent: 240 5% 25%;
+        --accent-foreground: 240 5% 95%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 240 5% 25%;
+        --input: 240 5% 25%;
+        --ring: 240 5% 65%;
+
+        --sidebar-background: 240 5% 10%;
+        --sidebar-foreground: 240 5% 65%;
+        --sidebar-primary: 240 5% 65%;
+        --sidebar-primary-foreground: 240 5% 10%;
+        --sidebar-accent: 240 5% 25%;
+        --sidebar-accent-foreground: 240 5% 95%;
+        --sidebar-border: 240 5% 25%;
+        --sidebar-ring: 240 5% 65%;
+
+        /* Chart colors */
+        --chart-primary: 240 5% 65%;
+        --chart-secondary: 240 5% 25%;
+        --chart-accent: 240 5% 65%;
+        --chart-muted: 240 5% 35%;
+        --chart-background: 240 5% 10%;
+
+        /* Chart series colors */
+        --chart-series-1: 240 5% 65%;
+        --chart-series-2: 240 5% 80%;
+        --chart-series-3: 240 5% 50%;
+        --chart-series-4: 240 5% 95%;
+        --chart-series-5: 240 5% 70%;
+    }
+
+    .theme-jotunheim {
+        /* Jotunheim (Yellow): Yellow */
+        --background: 0 0% 100%;
+        --foreground: 48 30% 15%;
+        --card: 0 0% 100%;
+        --card-foreground: 48 30% 15%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 48 30% 15%;
+        --primary: 48 90% 50%;
+        --primary-foreground: 48 10% 5%;
+        --secondary: 48 30% 92%;
+        --secondary-foreground: 48 30% 20%;
+        --muted: 48 30% 92%;
+        --muted-foreground: 48 30% 40%;
+        --accent: 48 30% 92%;
+        --accent-foreground: 48 30% 20%;
+        --destructive: 0 84% 60%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 48 30% 88%;
+        --input: 48 30% 88%;
+        --ring: 48 90% 50%;
+
+        --sidebar-background: 0 0% 100%;
+        --sidebar-foreground: 48 30% 40%;
+        --sidebar-primary: 48 90% 50%;
+        --sidebar-primary-foreground: 48 10% 5%;
+        --sidebar-accent: 48 30% 92%;
+        --sidebar-accent-foreground: 48 30% 20%;
+        --sidebar-border: 48 30% 88%;
+        --sidebar-ring: 48 90% 50%;
+
+        /* Chart colors */
+        --chart-primary: 48 90% 50%;
+        --chart-secondary: 48 30% 92%;
+        --chart-accent: 48 30% 40%;
+        --chart-muted: 48 30% 88%;
+        --chart-background: 0 0% 100%;
+
+        /* Chart series colors */
+        --chart-series-1: 48 90% 50%;
+        --chart-series-2: 48 90% 65%;
+        --chart-series-3: 48 80% 40%;
+        --chart-series-4: 48 90% 80%;
+        --chart-series-5: 48 70% 55%;
+    }
+
+    .dark.theme-jotunheim {
+        --background: 48 30% 10%;
+        --foreground: 48 30% 95%;
+        --card: 48 30% 12%;
+        --card-foreground: 48 30% 95%;
+        --popover: 48 30% 12%;
+        --popover-foreground: 48 30% 95%;
+        --primary: 48 90% 50%;
+        --primary-foreground: 48 10% 5%;
+        --secondary: 48 30% 25%;
+        --secondary-foreground: 48 30% 95%;
+        --muted: 48 30% 25%;
+        --muted-foreground: 48 30% 70%;
+        --accent: 48 30% 25%;
+        --accent-foreground: 48 30% 95%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 48 30% 25%;
+        --input: 48 30% 25%;
+        --ring: 48 90% 50%;
+
+        --sidebar-background: 48 30% 10%;
+        --sidebar-foreground: 48 30% 70%;
+        --sidebar-primary: 48 90% 50%;
+        --sidebar-primary-foreground: 48 10% 5%;
+        --sidebar-accent: 48 30% 25%;
+        --sidebar-accent-foreground: 48 30% 95%;
+        --sidebar-border: 48 30% 25%;
+        --sidebar-ring: 48 90% 50%;
+
+        /* Chart colors */
+        --chart-primary: 48 90% 50%;
+        --chart-secondary: 48 30% 25%;
+        --chart-accent: 48 30% 70%;
+        --chart-muted: 48 30% 35%;
+        --chart-background: 48 30% 10%;
+
+        /* Chart series colors */
+        --chart-series-1: 48 90% 50%;
+        --chart-series-2: 48 80% 65%;
+        --chart-series-3: 48 70% 75%;
+        --chart-series-4: 48 60% 60%;
+        --chart-series-5: 48 90% 80%;
+    }
+
+    .theme-vanaheim {
+        /* Vanaheim (Purple): Purple */
+        --background: 270 100% 98%;
+        --foreground: 270 70% 15%;
+        --card: 270 100% 99%;
+        --card-foreground: 270 70% 15%;
+        --popover: 270 100% 99%;
+        --popover-foreground: 270 70% 15%;
+        --primary: 270 100% 60%;
+        --primary-foreground: 270 100% 98%;
+        --secondary: 270 30% 94%;
+        --secondary-foreground: 270 70% 30%;
+        --muted: 270 30% 94%;
+        --muted-foreground: 270 30% 40%;
+        --accent: 270 30% 94%;
+        --accent-foreground: 270 70% 30%;
+        --destructive: 0 84% 60%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 270 30% 92%;
+        --input: 270 30% 92%;
+        --ring: 270 100% 60%;
+
+        --sidebar-background: 270 100% 98%;
+        --sidebar-foreground: 270 70% 40%;
+        --sidebar-primary: 270 100% 60%;
+        --sidebar-primary-foreground: 270 100% 98%;
+        --sidebar-accent: 270 30% 94%;
+        --sidebar-accent-foreground: 270 70% 30%;
+        --sidebar-border: 270 30% 92%;
+        --sidebar-ring: 270 100% 60%;
+
+        /* Chart colors */
+        --chart-primary: 270 100% 60%;
+        --chart-secondary: 270 30% 94%;
+        --chart-accent: 270 30% 40%;
+        --chart-muted: 270 30% 88%;
+        --chart-background: 270 100% 98%;
+
+        /* Chart series colors */
+        --chart-series-1: 270 100% 60%;
+        --chart-series-2: 270 90% 75%;
+        --chart-series-3: 270 80% 45%;
+        --chart-series-4: 270 70% 85%;
+        --chart-series-5: 270 60% 55%;
+    }
+
+    .dark.theme-vanaheim {
+        --background: 270 70% 8%;
+        --foreground: 270 100% 92%;
+        --card: 270 70% 10%;
+        --card-foreground: 270 100% 92%;
+        --popover: 270 70% 10%;
+        --popover-foreground: 270 100% 92%;
+        --primary: 270 100% 60%;
+        --primary-foreground: 270 100% 98%;
+        --secondary: 270 50% 20%;
+        --secondary-foreground: 270 100% 92%;
+        --muted: 270 50% 20%;
+        --muted-foreground: 270 50% 70%;
+        --accent: 270 50% 20%;
+        --accent-foreground: 270 100% 92%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 270 50% 20%;
+        --input: 270 50% 20%;
+        --ring: 270 100% 60%;
+
+        --sidebar-background: 270 70% 8%;
+        --sidebar-foreground: 270 50% 70%;
+        --sidebar-primary: 270 100% 60%;
+        --sidebar-primary-foreground: 270 100% 98%;
+        --sidebar-accent: 270 50% 20%;
+        --sidebar-accent-foreground: 270 100% 92%;
+        --sidebar-border: 270 50% 20%;
+        --sidebar-ring: 270 100% 60%;
+
+        /* Chart colors */
+        --chart-primary: 270 100% 60%;
+        --chart-secondary: 270 50% 20%;
+        --chart-accent: 270 50% 70%;
+        --chart-muted: 270 50% 30%;
+        --chart-background: 270 70% 8%;
+
+        /* Chart series colors */
+        --chart-series-1: 270 100% 60%;
+        --chart-series-2: 270 90% 70%;
+        --chart-series-3: 270 80% 80%;
+        --chart-series-4: 270 70% 50%;
+        --chart-series-5: 270 100% 85%;
+    }
+
+    .theme-svaralfheim {
+        /* Svaralfheim (Blue): Blue */
+        --background: 217 100% 98%;
+        --foreground: 217 70% 15%;
+        --card: 217 100% 99%;
+        --card-foreground: 217 70% 15%;
+        --popover: 217 100% 99%;
+        --popover-foreground: 217 70% 15%;
+        --primary: 217 100% 60%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 217 30% 94%;
+        --secondary-foreground: 217 70% 30%;
+        --muted: 217 30% 94%;
+        --muted-foreground: 217 30% 40%;
+        --accent: 217 30% 94%;
+        --accent-foreground: 217 70% 30%;
+        --destructive: 0 84% 60%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 217 30% 92%;
+        --input: 217 30% 92%;
+        --ring: 217 100% 60%;
+
+        --sidebar-background: 217 100% 98%;
+        --sidebar-foreground: 217 70% 40%;
+        --sidebar-primary: 217 100% 60%;
+        --sidebar-primary-foreground: 0 0% 100%;
+        --sidebar-accent: 217 30% 94%;
+        --sidebar-accent-foreground: 217 70% 30%;
+        --sidebar-border: 217 30% 92%;
+        --sidebar-ring: 217 100% 60%;
+
+        /* Chart colors */
+        --chart-primary: 217 100% 60%;
+        --chart-secondary: 217 30% 94%;
+        --chart-accent: 217 30% 40%;
+        --chart-muted: 217 30% 88%;
+        --chart-background: 217 100% 98%;
+
+        /* Chart series colors */
+        --chart-series-1: 217 100% 60%;
+        --chart-series-2: 217 90% 75%;
+        --chart-series-3: 217 80% 45%;
+        --chart-series-4: 217 70% 85%;
+        --chart-series-5: 217 60% 55%;
+    }
+
+    .dark.theme-svaralfheim {
+        --background: 217 70% 8%;
+        --foreground: 217 100% 92%;
+        --card: 217 70% 10%;
+        --card-foreground: 217 100% 92%;
+        --popover: 217 70% 10%;
+        --popover-foreground: 217 100% 92%;
+        --primary: 217 100% 60%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 217 50% 20%;
+        --secondary-foreground: 217 100% 92%;
+        --muted: 217 50% 20%;
+        --muted-foreground: 217 50% 70%;
+        --accent: 217 50% 20%;
+        --accent-foreground: 217 100% 92%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 217 50% 20%;
+        --input: 217 50% 20%;
+        --ring: 217 100% 60%;
+
+        --sidebar-background: 217 70% 8%;
+        --sidebar-foreground: 217 50% 70%;
+        --sidebar-primary: 217 100% 60%;
+        --sidebar-primary-foreground: 0 0% 100%;
+        --sidebar-accent: 217 50% 20%;
+        --sidebar-accent-foreground: 217 100% 92%;
+        --sidebar-border: 217 50% 20%;
+        --sidebar-ring: 217 100% 60%;
+
+        /* Chart colors */
+        --chart-primary: 217 100% 60%;
+        --chart-secondary: 217 50% 20%;
+        --chart-accent: 217 50% 70%;
+        --chart-muted: 217 50% 30%;
+        --chart-background: 217 70% 8%;
+
+        /* Chart series colors */
+        --chart-series-1: 217 100% 60%;
+        --chart-series-2: 217 90% 70%;
+        --chart-series-3: 217 80% 80%;
+        --chart-series-4: 217 70% 50%;
+        --chart-series-5: 217 100% 85%;
+    }
+
+    .theme-niflheim {
+        /* Niflheim (Green): Emerald */
+        --background: 152 100% 98%;
+        --foreground: 152 70% 15%;
+        --card: 152 100% 99%;
+        --card-foreground: 152 70% 15%;
+        --popover: 152 100% 99%;
+        --popover-foreground: 152 70% 15%;
+        --primary: 152 100% 40%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 152 30% 94%;
+        --secondary-foreground: 152 70% 30%;
+        --muted: 152 30% 94%;
+        --muted-foreground: 152 30% 40%;
+        --accent: 152 30% 94%;
+        --accent-foreground: 152 70% 30%;
+        --destructive: 0 84% 60%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 152 30% 92%;
+        --input: 152 30% 92%;
+        --ring: 152 100% 40%;
+
+        --sidebar-background: 152 100% 98%;
+        --sidebar-foreground: 152 70% 40%;
+        --sidebar-primary: 152 100% 40%;
+        --sidebar-primary-foreground: 0 0% 100%;
+        --sidebar-accent: 152 30% 94%;
+        --sidebar-accent-foreground: 152 70% 30%;
+        --sidebar-border: 152 30% 92%;
+        --sidebar-ring: 152 100% 40%;
+
+        /* Chart colors */
+        --chart-primary: 152 100% 40%;
+        --chart-secondary: 152 30% 94%;
+        --chart-accent: 152 30% 40%;
+        --chart-muted: 152 30% 88%;
+        --chart-background: 152 100% 98%;
+
+        /* Chart series colors */
+        --chart-series-1: 152 100% 40%;
+        --chart-series-2: 152 90% 55%;
+        --chart-series-3: 152 80% 35%;
+        --chart-series-4: 152 70% 70%;
+        --chart-series-5: 152 100% 85%;
+    }
+
+    .dark.theme-niflheim {
+        --background: 152 70% 8%;
+        --foreground: 152 100% 92%;
+        --card: 152 70% 10%;
+        --card-foreground: 152 100% 92%;
+        --popover: 152 70% 10%;
+        --popover-foreground: 152 100% 92%;
+        --primary: 152 100% 40%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 152 50% 20%;
+        --secondary-foreground: 152 100% 92%;
+        --muted: 152 50% 20%;
+        --muted-foreground: 152 50% 70%;
+        --accent: 152 50% 20%;
+        --accent-foreground: 152 100% 92%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 152 50% 20%;
+        --input: 152 50% 20%;
+        --ring: 152 100% 40%;
+
+        --sidebar-background: 152 70% 8%;
+        --sidebar-foreground: 152 50% 70%;
+        --sidebar-primary: 152 100% 40%;
+        --sidebar-primary-foreground: 0 0% 100%;
+        --sidebar-accent: 152 50% 20%;
+        --sidebar-accent-foreground: 152 100% 92%;
+        --sidebar-border: 152 50% 20%;
+        --sidebar-ring: 152 100% 40%;
+
+        /* Chart colors */
+        --chart-primary: 152 100% 40%;
+        --chart-secondary: 152 50% 20%;
+        --chart-accent: 152 50% 70%;
+        --chart-muted: 152 50% 30%;
+        --chart-background: 152 70% 8%;
+
+        /* Chart series colors */
+        --chart-series-1: 152 100% 40%;
+        --chart-series-2: 152 90% 60%;
+        --chart-series-3: 152 80% 70%;
+        --chart-series-4: 152 70% 50%;
+        --chart-series-5: 152 90% 75%;
+    }
+
+    .theme-helheim {
+        /* Helheim (Cyan): Cyan */
+        --background: 192 100% 98%;
+        --foreground: 192 70% 15%;
+        --card: 192 100% 99%;
+        --card-foreground: 192 70% 15%;
+        --popover: 192 100% 99%;
+        --popover-foreground: 192 70% 15%;
+        --primary: 192 100% 50%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 192 30% 94%;
+        --secondary-foreground: 192 70% 30%;
+        --muted: 192 30% 94%;
+        --muted-foreground: 192 30% 40%;
+        --accent: 192 30% 94%;
+        --accent-foreground: 192 70% 30%;
+        --destructive: 0 84% 60%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 192 30% 92%;
+        --input: 192 30% 92%;
+        --ring: 192 100% 50%;
+
+        --sidebar-background: 192 100% 98%;
+        --sidebar-foreground: 192 70% 40%;
+        --sidebar-primary: 192 100% 50%;
+        --sidebar-primary-foreground: 0 0% 100%;
+        --sidebar-accent: 192 30% 94%;
+        --sidebar-accent-foreground: 192 70% 30%;
+        --sidebar-border: 192 30% 92%;
+        --sidebar-ring: 192 100% 50%;
+
+        /* Chart colors */
+        --chart-primary: 192 100% 50%;
+        --chart-secondary: 192 30% 94%;
+        --chart-accent: 192 30% 40%;
+        --chart-muted: 192 30% 88%;
+        --chart-background: 192 100% 98%;
+
+        /* Chart series colors */
+        --chart-series-1: 192 100% 50%;
+        --chart-series-2: 192 90% 65%;
+        --chart-series-3: 192 80% 40%;
+        --chart-series-4: 192 70% 80%;
+        --chart-series-5: 192 100% 70%;
+    }
+
+    .dark.theme-helheim {
+        --background: 192 70% 8%;
+        --foreground: 192 100% 92%;
+        --card: 192 70% 10%;
+        --card-foreground: 192 100% 92%;
+        --popover: 192 70% 10%;
+        --popover-foreground: 192 100% 92%;
+        --primary: 192 100% 50%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 192 50% 20%;
+        --secondary-foreground: 192 100% 92%;
+        --muted: 192 50% 20%;
+        --muted-foreground: 192 50% 70%;
+        --accent: 192 50% 20%;
+        --accent-foreground: 192 100% 92%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 192 50% 20%;
+        --input: 192 50% 20%;
+        --ring: 192 100% 50%;
+
+        --sidebar-background: 192 70% 8%;
+        --sidebar-foreground: 192 50% 70%;
+        --sidebar-primary: 192 100% 50%;
+        --sidebar-primary-foreground: 0 0% 100%;
+        --sidebar-accent: 192 50% 20%;
+        --sidebar-accent-foreground: 192 100% 92%;
+        --sidebar-border: 192 50% 20%;
+        --sidebar-ring: 192 100% 50%;
+
+        /* Chart colors */
+        --chart-primary: 192 100% 50%;
+        --chart-secondary: 192 50% 20%;
+        --chart-accent: 192 50% 70%;
+        --chart-muted: 192 50% 30%;
+        --chart-background: 192 70% 8%;
+
+        /* Chart series colors */
+        --chart-series-1: 192 100% 50%;
+        --chart-series-2: 192 90% 70%;
+        --chart-series-3: 192 80% 80%;
+        --chart-series-4: 192 70% 55%;
+        --chart-series-5: 192 90% 65%;
+    }
+
+    .theme-muspelheim {
+        /* Muspelheim (Red): Red */
+        --background: 0 100% 98%;
+        --foreground: 0 70% 15%;
+        --card: 0 100% 99%;
+        --card-foreground: 0 70% 15%;
+        --popover: 0 100% 99%;
+        --popover-foreground: 0 70% 15%;
+        --primary: 0 100% 55%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 0 30% 94%;
+        --secondary-foreground: 0 70% 30%;
+        --muted: 0 30% 94%;
+        --muted-foreground: 0 30% 40%;
+        --accent: 0 30% 94%;
+        --accent-foreground: 0 70% 30%;
+        --destructive: 0 84% 60%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 0 30% 92%;
+        --input: 0 30% 92%;
+        --ring: 0 100% 55%;
+
+        --sidebar-background: 0 100% 98%;
+        --sidebar-foreground: 0 70% 40%;
+        --sidebar-primary: 0 100% 55%;
+        --sidebar-primary-foreground: 0 0% 100%;
+        --sidebar-accent: 0 30% 94%;
+        --sidebar-accent-foreground: 0 70% 30%;
+        --sidebar-border: 0 30% 92%;
+        --sidebar-ring: 0 100% 55%;
+
+        /* Chart colors */
+        --chart-primary: 0 100% 55%;
+        --chart-secondary: 0 30% 94%;
+        --chart-accent: 0 30% 40%;
+        --chart-muted: 0 30% 88%;
+        --chart-background: 0 100% 98%;
+
+        /* Chart series colors */
+        --chart-series-1: 0 100% 55%;
+        --chart-series-2: 0 90% 70%;
+        --chart-series-3: 0 80% 45%;
+        --chart-series-4: 0 70% 85%;
+        --chart-series-5: 0 100% 75%;
+    }
+
+    .dark.theme-muspelheim {
+        --background: 0 70% 8%;
+        --foreground: 0 100% 92%;
+        --card: 0 70% 10%;
+        --card-foreground: 0 100% 92%;
+        --popover: 0 70% 10%;
+        --popover-foreground: 0 100% 92%;
+        --primary: 0 100% 55%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 0 50% 20%;
+        --secondary-foreground: 0 100% 92%;
+        --muted: 0 50% 20%;
+        --muted-foreground: 0 50% 70%;
+        --accent: 0 50% 20%;
+        --accent-foreground: 0 100% 92%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 0 50% 20%;
+        --input: 0 50% 20%;
+        --ring: 0 100% 55%;
+
+        --sidebar-background: 0 70% 8%;
+        --sidebar-foreground: 0 50% 70%;
+        --sidebar-primary: 0 100% 55%;
+        --sidebar-primary-foreground: 0 0% 100%;
+        --sidebar-accent: 0 50% 20%;
+        --sidebar-accent-foreground: 0 100% 92%;
+        --sidebar-border: 0 50% 20%;
+        --sidebar-ring: 0 100% 55%;
+
+        /* Chart colors */
+        --chart-primary: 0 100% 55%;
+        --chart-secondary: 0 50% 20%;
+        --chart-accent: 0 50% 70%;
+        --chart-muted: 0 50% 30%;
+        --chart-background: 0 70% 8%;
+
+        /* Chart series colors */
+        --chart-series-1: 0 100% 55%;
+        --chart-series-2: 0 90% 70%;
+        --chart-series-3: 0 80% 80%;
+        --chart-series-4: 0 70% 50%;
+        --chart-series-5: 0 90% 65%;
+    }
+
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+    }
+
+    /* Add Runic font class */
+    .font-runic {
+        font-family: "Noto Sans Runic", sans-serif;
+    }
+}
+
+@layer components {
+    .dashboard-card {
+        @apply bg-card rounded-xl border p-4 shadow-sm transition-all hover:shadow-md;
+    }
+
+    .dashboard-card-content {
+        @apply space-y-4;
+    }
+
+    .dashboard-card-header {
+        @apply flex items-center justify-between;
+    }
+
+    .dashboard-card-title {
+        @apply text-lg font-semibold;
+    }
+
+    .dashboard-card-stats {
+        @apply grid grid-cols-2 gap-2 text-sm;
+    }
+
+    .dashboard-stat {
+        @apply flex items-center gap-2;
+    }
+
+    .dashboard-stat-value {
+        @apply font-medium;
+    }
+
+    .dashboard-card-footer {
+        @apply mt-4 flex items-center justify-between text-sm;
+    }
+
+    /* Button with runic accent */
+    .btn-runic {
+        @apply relative;
+    }
+
+    .btn-runic::after {
+        content: attr(data-rune);
+        @apply font-runic absolute opacity-5 text-4xl transition-opacity;
+        right: -5px;
+        bottom: -12px;
+        transform: rotate(-10deg);
+    }
+
+    .btn-runic:hover::after {
+        @apply opacity-10;
+    }
+
+    /* Theme indicator styles */
+    .theme-indicator {
+        @apply inline-flex items-center justify-center font-runic text-xl p-1;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Chart styling */
+    .recharts-wrapper .recharts-cartesian-grid-horizontal line,
+    .recharts-wrapper .recharts-cartesian-grid-vertical line {
+        @apply stroke-border stroke-[1px] opacity-50;
+    }
+
+    .recharts-wrapper .recharts-tooltip-cursor {
+        @apply fill-muted/50;
+    }
+
+    .recharts-wrapper .recharts-default-tooltip {
+        @apply bg-card/90 border border-border/50 shadow-md !p-2 rounded-md backdrop-blur-sm;
+    }
+
+    .recharts-wrapper text {
+        @apply fill-muted-foreground text-xs;
+    }
+
+    .recharts-wrapper .recharts-active-dot {
+        @apply stroke-background;
+    }
+
+    /* Chart color variables usage */
+    .recharts-wrapper .recharts-bar-rectangle:nth-of-type(1) path,
+    .recharts-wrapper .recharts-area:nth-of-type(1) path,
+    .recharts-wrapper .recharts-line:nth-of-type(1) path,
+    .recharts-wrapper .recharts-sector:nth-of-type(1) {
+        @apply fill-[hsl(var(--chart-series-1))] stroke-[hsl(var(--chart-series-1))];
+    }
+
+    .recharts-wrapper .recharts-bar-rectangle:nth-of-type(2) path,
+    .recharts-wrapper .recharts-area:nth-of-type(2) path,
+    .recharts-wrapper .recharts-line:nth-of-type(2) path,
+    .recharts-wrapper .recharts-sector:nth-of-type(2) {
+        @apply fill-[hsl(var(--chart-series-2))] stroke-[hsl(var(--chart-series-2))];
+    }
+
+    .recharts-wrapper .recharts-bar-rectangle:nth-of-type(3) path,
+    .recharts-wrapper .recharts-area:nth-of-type(3) path,
+    .recharts-wrapper .recharts-line:nth-of-type(3) path,
+    .recharts-wrapper .recharts-sector:nth-of-type(3) {
+        @apply fill-[hsl(var(--chart-series-3))] stroke-[hsl(var(--chart-series-3))];
+    }
+
+    .recharts-wrapper .recharts-bar-rectangle:nth-of-type(4) path,
+    .recharts-wrapper .recharts-area:nth-of-type(4) path,
+    .recharts-wrapper .recharts-line:nth-of-type(4) path,
+    .recharts-wrapper .recharts-sector:nth-of-type(4) {
+        @apply fill-[hsl(var(--chart-series-4))] stroke-[hsl(var(--chart-series-4))];
+    }
+
+    .recharts-wrapper .recharts-bar-rectangle:nth-of-type(5) path,
+    .recharts-wrapper .recharts-area:nth-of-type(5) path,
+    .recharts-wrapper .recharts-line:nth-of-type(5) path,
+    .recharts-wrapper .recharts-sector:nth-of-type(5) {
+        @apply fill-[hsl(var(--chart-series-5))] stroke-[hsl(var(--chart-series-5))];
+    }
+}

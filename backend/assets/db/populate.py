@@ -1,7 +1,11 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
+<<<<<<< HEAD
 from models import Post, User, Tag, PostTag
+=======
+from models import Post, User
+>>>>>>> main
 
 def populate() -> None:
     engine = create_engine("sqlite:///example.db")
@@ -62,6 +66,7 @@ def populate() -> None:
         )
     ]
 
+<<<<<<< HEAD
     # tags = [
     #     Tag(
     #         user_id=1,
@@ -112,6 +117,10 @@ def populate() -> None:
     session.add_all(posts)
     # session.add_all(tags)
     # session.add_all(post_tags)
+=======
+    session.add_all(users)
+    session.add_all(posts)
+>>>>>>> main
     session.commit()
 
     print("Database populated with sample posts.")
