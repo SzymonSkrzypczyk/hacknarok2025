@@ -2,7 +2,7 @@ interface ScrappedXPost {
   app: string
 
   /** Fullname */
-  accountName: string
+  author: string
 
   /** Post's publish date */
   date: string
