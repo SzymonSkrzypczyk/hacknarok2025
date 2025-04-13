@@ -1,3 +1,4 @@
+from os import environ
 from typing import Union, Optional
 from datetime import date
 from dotenv import load_dotenv
@@ -18,7 +19,8 @@ from assets.db.models import Base
 
 load_dotenv()
 app = FastAPI()
-engine = create_engine("sqlite:///example.db")
+DATABASE_URL = environ.get("DATABASE_URL", "postgresql://user:password@db:5432/mydatabase")
+engine = create_engine(DATABASE_URL)
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
