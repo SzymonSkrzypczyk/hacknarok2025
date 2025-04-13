@@ -1,0 +1,22 @@
+services:
+  backend:
+    build:
+        context: backend/
+        dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./backend/assets/db/init:/docker-entrypoint-initdb.d
+    ports:
+        - "5432:5432"
+
+volumes:
+  db_data:
