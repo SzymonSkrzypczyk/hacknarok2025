@@ -1,14 +1,22 @@
 from typing import List, Union, Optional
 from datetime import date
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request, status, HTTPException, Response
+from fastapi import FastAPI, Response, Request, status, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel, RootModel
 
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+
 from post_filter import chain as post_filter_chain
-from fact_check import chain as fact_check_chain
+from fast_check import chain as fact_check_chain
+from summarizer import chain as summarize_chain
+from tagger import chain as tag_chain
 from logger import logger, log_config
+
+from utils import *
+import json
 
 load_dotenv()
 app = FastAPI()
@@ -50,6 +58,22 @@ class ResponseModel(BaseModel):
     reposts: Optional[int] = 0
     likes: Optional[int] = 0
 
+class UserSession(BaseModel):
+    """
+    Incoming User Model
+
+    :param user_name: User Name
+    # date of session start (tbd)
+    """
+    user_name: str
+
+class SessionSummaryResponse(BaseModel):
+    """
+    Outgoing Session summary model
+
+    """
+    summaries: List[dict]
+
 
 class ResponseModelList(RootModel[List[ResponseModel]]):
     """Outgoing list of filtered responses."""
@@ -90,13 +114,37 @@ async def validation_exception_handler(_request: Request, exc: RequestValidation
 
 
 @app.post("/posts-summary")
-async def get_posts_summary():
+async def get_posts_summary(user_session: UserSession) -> SessionSummaryResponse:
     """
-    Summarize a batch of posts
+    Get current summaries for the user session.
 
     :return:
     """
-    ...
+    engine = create_engine(DATABASE_URI)
+    session = sessionmaker(bind=engine)()
+
+    user = session.query(User).filter(User.name == user_session.user_name).first()
+
+    results = session.query(Summary).filter(
+            Summary.user_id == user.id \
+        and Summary.date_created >= datetime.datetime.now() - datetime.timedelta(hours=24)).all()
+    
+    all_summaries = [{s.tag: {"short_summary": s.short_summary, "long_summary": s.long_summary}} for s in results]
+
+    return SessionSummaryResponse(summaries=all_summaries)
+
+@app.post("/trigger-processing")
+async def get_posts_tag(user_session: UserSession):
+    engine = create_engine(DATABASE_URI)
+    session = sessionmaker(bind=engine)()
+
+    print("PROCESSING NEW POSTS")
+    process_new_posts(session, user_session.user_name)
+    print("PROCESSING SUMMARIES")
+    process_summaries(session, user_session.user_name)
+
+    return 200
+
 
 
 @app.post("/post-factcheck-multiple", response_model=ResponseModelList)

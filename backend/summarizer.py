@@ -7,12 +7,24 @@ from langchain_core.output_parsers import JsonOutputParser
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from time import perf_counter
 from dotenv import load_dotenv
-from assets.prompts import PROMPT_SUMMARIZER, PROMPT_GET_TAGS
+from assets.prompts import PROMPT_SUMMARIZE_BY_TAG, PROMPT_GET_TAGS
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from assets.db.models import User, Post, Tag
+
+load_dotenv()
+
+def _get_chain():
+    llm = OpenAI()
+    prompt = PromptTemplate.from_template(PROMPT_SUMMARIZE_BY_TAG)
+
+    return prompt | llm
+
+chain = _get_chain()
+
+
 
 load_dotenv()
 
