@@ -1,66 +1,54 @@
-from typing import List, Union, Optional
+from os import environ
+from typing import Union, Optional
 from datetime import date
 from dotenv import load_dotenv
 from fastapi import FastAPI, Response, Request, status, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel, RootModel
-
-from post_filter_single import chain as post_filter_single_chain
-from post_filter_multiple import chain as post_filter_multiple_chain
-from fact_check_single import chain as fact_check_single_chain
-from fact_check_multiple import chain as fact_check_multiple_chain
+from post_filter import chain as post_filter_chain
+from fact_check import chain as fact_check_chain
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from summarizer import chain as summarize_chain
+from tagger import chain as tag_chain
 from logger import logger, log_config
+
+from utils import *
+from assets.db.models import Base
 
 load_dotenv()
 app = FastAPI()
+DATABASE_URL = environ.get("DATABASE_URL", "postgresql://user:password@db:5432/mydatabase")
+engine = create_engine(DATABASE_URL)
+Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
+session = Session()
 
 
-class Post(BaseModel):
-    """
-    Incoming Post model
+class Stats(BaseModel):
+    likesCount: int
+    viewsCount: int
+    commentsCount: int
 
-    :param author: Author of the post
-    :param date: Date of the post
-    :param content: Content of the post
-    :param likes: Number of likes
-    """
-    author: Optional[str] = None
-    date: Optional[Union[str, date]] = None
+
+class ScrappedXPost(BaseModel):
+    app: str
+    accountName: str
+    date: str
     content: str
-    likes: Optional[int] = 0
-    reposts: Optional[int] = 0
-    comments: Optional[int] = 0
-    link: Optional[str] = None
-    categories_applied: List[str] = []
+    link: str
+    avatarURL: str
+
+    stats: Stats
 
 
-class PostFilterResponse(BaseModel):
-    """
-    Outgoing Post model
-
-    """
-    match_percent: int
-    is_high_match: bool
-    author: Optional[str] = None
-    date: Optional[Union[str, date]] = None
-    link: Optional[str] = None
-    category: Optional[List[str]] = []
-    reposts: Optional[int] = 0
-    likes: Optional[int] = 0
+class APIRequest(BaseModel):
+    expectedContent: List[str]
+    scrappedDataBatch: List[ScrappedXPost]
 
 
-class PostList(RootModel[List[Post]]):
-    """Incoming list of posts."""
-    pass
-
-
-class PostFilterListResponse(RootModel[List[PostFilterResponse]]):
-    """Outgoing list of filtered responses."""
-    pass
-
-
-class PostFactCheckResponse(BaseModel):
+class ResponseModel(BaseModel):
     """
     Outgoing Post model
 
@@ -74,56 +62,66 @@ class PostFactCheckResponse(BaseModel):
     reposts: Optional[int] = 0
     likes: Optional[int] = 0
 
+class UserSession(BaseModel):
+    """
+    Incoming User Model
 
-class PostFactCheckListResponse(RootModel[List[PostFactCheckResponse]]):
+    :param user_name: User Name
+    # date of session start (tbd)
+    """
+    user_name: str
+
+class SessionSummaryResponse(BaseModel):
+    """
+    Outgoing Session summary model
+
+    """
+    summaries: List[dict]
+
+
+class ResponseModelList(RootModel[List[ResponseModel]]):
     """Outgoing list of filtered responses."""
     pass
 
 
-@app.post("/post-filter-single", response_model=PostFilterResponse)
-async def filter_post_single(post_data: Post) -> PostFilterResponse:
+@app.post("/post-filter-multiple", response_model=ResponseModelList)
+async def filter_post_multiple(post_data: APIRequest) -> ResponseModelList:
     """
     Return a list of hashtags based on a content
 
     :return:
     """
-    logger.info("Filtering single post: %s", post_data.content)
-    content = await post_filter_single_chain.ainvoke({
-        "categories_applied": post_data.categories_applied,
-        "content": post_data.content
-    })
+    logger.info("Filtering multiple posts")
 
-    if not content:
-        logger.error("Empty response from model - filtering single")
-        raise HTTPException(500, "Error in the model response - empty response")
+    # add posts to the database
+    for post in post_data.scrappedDataBatch:
+        try:
+            post_date = date.fromisoformat(post.date) if post.date else date.today()
+        except:
+            post_date = date.today()
+        new_post = Post(
+            app_type=post.app,
+            user_id=1,
+            url=post.link,
+            date=post_date,
+            likes=post.stats.likesCount,
+            views=post.stats.viewsCount,
+            author=post.accountName,
+            content=post.content
+        )
+        session.add(new_post)
+    session.commit()
 
-    if "match_percent" not in content or "is_high_match" not in content:
-        logger.error("Invalid response keys: %s - filtering single", content.keys())
-        raise HTTPException(500, "Error in the model response - invalid keys in the response")
-
-    return PostFilterResponse(
-        match_percent=content["match_percent"],
-        is_high_match=content["is_high_match"]
-    )
-
-
-@app.post("/post-filter-multiple", response_model=PostFilterListResponse)
-async def filter_post_multiple(post_data: PostList) -> PostFilterListResponse:
-    """
-    Return a list of hashtags based on a content
-
-    :return:
-    """
-    logger.info("Filtering multiple posts: %s", post_data.content)
-    content = await post_filter_multiple_chain.ainvoke({
-        "items": post_data
+    content = await post_filter_chain.ainvoke({
+        "items": [post.content for post in post_data.scrappedDataBatch],
+        "expected_categories": post_data.expectedContent
     })
 
     if not content:
         logger.error("Empty response from model - filtering multiple")
         raise HTTPException(500, "Error in the model response - empty response")
 
-    if "match_percent" not in content[0] or "is_high_match" not in content[0]:
+    if "confidentiality_score" not in content[0] or "truthy" not in content[0]:
         logger.error("Invalid response keys: %s - filtering multiple", content[0].keys())
         raise HTTPException(500, "Error in the model response - invalid keys in the response")
 
@@ -140,51 +138,50 @@ async def validation_exception_handler(_request: Request, exc: RequestValidation
 
 
 @app.post("/posts-summary")
-async def get_posts_summary():
+async def get_posts_summary(user_session: UserSession) -> SessionSummaryResponse:
     """
-    Summarize a batch of posts
+    Get current summaries for the user session.
 
     :return:
     """
-    ...
+    engine = create_engine(DATABASE_URI)
+    session = sessionmaker(bind=engine)()
+
+    user = session.query(User).filter(User.name == user_session.user_name).first()
+
+    results = session.query(Summary).filter(
+            Summary.user_id == user.id \
+        and Summary.date_created >= datetime.datetime.now() - datetime.timedelta(hours=24)).all()
+    
+    all_summaries = [{s.tag: {"short_summary": s.short_summary, "long_summary": s.long_summary}} for s in results]
+
+    return SessionSummaryResponse(summaries=all_summaries)
+
+@app.post("/trigger-processing")
+async def get_posts_tag(user_session: UserSession):
+    engine = create_engine(DATABASE_URI)
+    session = sessionmaker(bind=engine)()
+
+    print("PROCESSING NEW POSTS")
+    process_new_posts(session, user_session.user_name)
+    print("PROCESSING SUMMARIES")
+    process_summaries(session, user_session.user_name)
+
+    return 200
 
 
-@app.post("/post-factcheck-single", response_model=PostFactCheckResponse)
-async def get_posts_factcheck_single(post_data: Post) -> PostFactCheckResponse:
+
+@app.post("/post-factcheck-multiple", response_model=ResponseModelList)
+async def get_posts_factcheck_multiple(post_data: APIRequest) -> ResponseModelList:
     """
     Fact-check a post
 
     :return:
     """
-    logger.info("Fact-checking single post: %s", post_data.content)
-    content = await fact_check_single_chain.ainvoke({
-        "content": post_data.content
-    })
-
-    if not content:
-        logger.error("Empty response from model - fact-checking single")
-        raise HTTPException(500, "Error in the model response - empty response")
-
-    if "truthy" not in content or "confidentiality_score" not in content:
-        logger.error("Invalid response keys: %s - fact-checking single", content.keys())
-        raise HTTPException(500, "Error in the model response - invalid keys in the response")
-
-    return PostFactCheckResponse(
-        confidentiality_score=content["confidentiality_score"],
-        truthy=content["truthy"]
-    )
-
-
-@app.post("/post-factcheck-multiple", response_model=PostFactCheckListResponse)
-async def get_posts_factcheck_multiple(post_data: PostList) -> PostFactCheckListResponse:
-    """
-    Fact-check a post
-
-    :return:
-    """
-    logger.info("Fact-checking multiple posts: %s", post_data.content)
-    content = await fact_check_multiple_chain.ainvoke({
-        "items": post_data
+    logger.info("Fact-checking multiple posts")
+    content = await fact_check_chain.ainvoke({
+        "items": [post.content for post in post_data.scrappedDataBatch],
+        "expected_categories": post_data.expectedContent
     })
 
     if not content:
@@ -195,8 +192,8 @@ async def get_posts_factcheck_multiple(post_data: PostList) -> PostFactCheckList
         logger.error("Invalid response keys: %s - fact-checking multiple", content[0].keys())
         raise HTTPException(500, "Error in the model response - invalid keys in the response")
 
-    return PostFactCheckListResponse(
-        [PostFactCheckResponse(
+    return ResponseModelList(
+        [ResponseModel(
             confidentiality_score=post["confidentiality_score"],
             truthy=post["truthy"]
         )
