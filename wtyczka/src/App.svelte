@@ -8,9 +8,21 @@
   import Minilogo from "./lib/icons/minilogo.svelte";
 
   let preferences = $state<string[]>([]);
+  let totalNumberOfHandledPosts = $state<number>(0);
 
   window.addEventListener("message", (event) => {
-    console.log(event.data.payload);
+    totalNumberOfHandledPosts += event.data.payload.length;
+
+    window.parent.postMessage(
+      {
+        plugin: "wtyczka",
+        payload: {
+          type: "block",
+          dataToBlock: event.data.payload,
+        },
+      },
+      "*"
+    );
   });
 
   function closeWidget() {
@@ -37,8 +49,6 @@
       "*"
     );
   }
-
-  console.log(preferences);
 </script>
 
 <main>
@@ -54,6 +64,13 @@
     </h3>
 
     <Button onclick={closeWidget} variant="ghost">x</Button>
+  </div>
+
+  <div class="flex items-center justify-between w-full mt-4">
+    <span>
+      <span class="text-sm text-gray-500">Total number of handled posts:</span>
+      <strong class="text-lg ml-2">{totalNumberOfHandledPosts}</strong>
+    </span>
   </div>
 
   <div class="flex-grow w-full">
@@ -76,11 +93,7 @@
           </Card.Header>
           <Card.Content class="space-y-2 flex-grow gap-2">
             <div class="flex gap-2">
-              <Input
-                id="name"
-                value="Pedro Duarte"
-                placeholder="Enter a keyword"
-              />
+              <Input id="name" placeholder="Enter a keyword" />
 
               <Button
                 class="p-2"
@@ -105,7 +118,7 @@
                 </span>
               {:else}
                 {#each preferences as preference}
-                  <div class="bg-gray-200 rounded-full px-2 text-sm">
+                  <div class="bg-gray-200 rounded-full px-4 text-xs">
                     <span>
                       {preference}
                     </span>
