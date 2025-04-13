@@ -1,25 +1,29 @@
-from typing import List, Union, Optional
+from os import environ
+from typing import Union, Optional
 from datetime import date
 from dotenv import load_dotenv
 from fastapi import FastAPI, Response, Request, status, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel, RootModel
-
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
-
 from post_filter import chain as post_filter_chain
-from fast_check import chain as fact_check_chain
+from fact_check import chain as fact_check_chain
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from summarizer import chain as summarize_chain
 from tagger import chain as tag_chain
 from logger import logger, log_config
 
 from utils import *
-import json
+from assets.db.models import Base
 
 load_dotenv()
 app = FastAPI()
+DATABASE_URL = environ.get("DATABASE_URL", "postgresql://user:password@db:5432/mydatabase")
+engine = create_engine(DATABASE_URL)
+Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
+session = Session()
 
 
 class Stats(BaseModel):
@@ -88,6 +92,26 @@ async def filter_post_multiple(post_data: APIRequest) -> ResponseModelList:
     :return:
     """
     logger.info("Filtering multiple posts")
+
+    # add posts to the database
+    for post in post_data.scrappedDataBatch:
+        try:
+            post_date = date.fromisoformat(post.date) if post.date else date.today()
+        except:
+            post_date = date.today()
+        new_post = Post(
+            app_type=post.app,
+            user_id=1,
+            url=post.link,
+            date=post_date,
+            likes=post.stats.likesCount,
+            views=post.stats.viewsCount,
+            author=post.accountName,
+            content=post.content
+        )
+        session.add(new_post)
+    session.commit()
+
     content = await post_filter_chain.ainvoke({
         "items": [post.content for post in post_data.scrappedDataBatch],
         "expected_categories": post_data.expectedContent

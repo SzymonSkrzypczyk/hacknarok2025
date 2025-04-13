@@ -3,9 +3,11 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from datetime import datetime
 
+
 DATABASE_URL = "sqlite:///example.db"
 engine = create_engine(DATABASE_URL, echo=True)
 Base = declarative_base()
+
 
 class User(Base):
     __tablename__ = 'users'
@@ -16,6 +18,7 @@ class User(Base):
 
     tags = relationship("Tag", back_populates="user")
     posts = relationship("Post", back_populates="user")
+
 
 class Post(Base):
     __tablename__ = "posts"
@@ -48,6 +51,7 @@ class Tag(Base):
     user = relationship("User", back_populates="tags")
     posts = relationship("Post", secondary="post_tags", back_populates="tags")
 
+
 class PostTag(Base):
     __tablename__ = "post_tags"
     
@@ -61,6 +65,7 @@ class PostTag(Base):
         ForeignKeyConstraint(['tag_id'], ['tags.id']),
     )
 
+
 class Summary(Base):
     __tablename__ = "summaries"
 
@@ -70,8 +75,6 @@ class Summary(Base):
     short_summary = Column(String, nullable=False)
     long_summary = Column(String, nullable=False)
     date_created = Column(DateTime, nullable=False, default=datetime.now)
-
-    
 
 
 if __name__ == "__main__":
