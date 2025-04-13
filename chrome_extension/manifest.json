@@ -16,6 +16,6 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_icon": "icons/rocket.png"
+    "default_icon": "icons/icon16x16.png"
   }
 }
