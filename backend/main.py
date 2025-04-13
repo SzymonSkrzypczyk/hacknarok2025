@@ -1,7 +1,7 @@
 from typing import List, Union, Optional
 from datetime import date
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request, status, HTTPException
+from fastapi import FastAPI, Request, status, HTTPException, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel, RootModel
@@ -137,7 +137,7 @@ async def health_check():
 
     :return:
     """
-    return ResponseModel(status_code=200, content="I'm still standing")
+    return Response(status_code=200, content="I'm still standing")
 
 
 @app.get("/")
