@@ -11,36 +11,39 @@ OPENAI_API_KEY = environ["OPENAI_API_KEY"]
 PROMPT = PromptTemplate.from_template("""
 You are a content classification assistant.
 
-Your task is to analyze a list of blog posts or articles. For each post, you will:
-1. Identify which categories it fits into from a general knowledge perspective.
-2. Compare the identified categories with the **expected categories provided for that specific post**.
+Your task is to analyze a list of blog posts. For each post:
+1. Examine its content.
+2. From the global list of expected categories, identify which ones apply to the post.
 3. Return:
-   - The **percentage** of expected categories that match (rounded to the nearest whole number).
-   - A **boolean** indicating whether the match is 70% or higher.
+   - `"confidentiality_score"`: the percentage of categories from the expected list that apply to the post content (rounded to the nearest whole number).
+   - `"truthy"`: `true` if **at least one** expected category applies to the content, otherwise `false`.
 
-Only consider categories from the expected list when evaluating each post.
+### Expected Categories
+{expected_categories}
 
-The input is a list of post objects, each structured like this:
+### Posts to Analyze
+Each post has the following format:
 {{
-  "content": "<post content>",
-  "categories_applied": ["Category1", "Category2", ...]
+  "content": "<post content>"
 }}
 
-Input list:
+### Input
 {items}
 
-| Output Format |
-Return only a valid **JSON array of objects**, one per post. Each object must follow this structure:
+### Output
+Return a **JSON array** of objects (one per post), in the format:
 
 [
   {{
-    "match_percent": 80,
-    "is_high_match": true
+    "confidentiality_score": <int>,   // 0–100
+    "truthy": <bool>                  // true if at least one expected category applies
   }},
   ...
 ]
-""")
 
+⚠️ Only return valid JSON. Do not include explanations, markdown, or any extra text.
+⚠️ Do not use trailing commas in the JSON.
+""")
 openai_model = OpenAI(
     openai_api_key=OPENAI_API_KEY,
 )
@@ -58,4 +61,4 @@ if __name__ == "__main__":
     ]
 
     result = chain.invoke({"categories_applied": categories_applied, "contents": contents})
-    print(result)
+
