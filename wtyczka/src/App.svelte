@@ -1,4 +1,6 @@
 <script lang="ts">
+  import "./app.css";
+  import Button from "./lib/components/ui/button/button.svelte";
   window.addEventListener("message", (event) => {
     console.log(event.data.payload);
   });
@@ -29,7 +31,9 @@
   }
 </script>
 
-<main>
-  <button onclick={closeWidget}> Close Widget </button>
-  <button onclick={handleClick}> Send Message </button>
+<main class="flex flex-col items-center justify-center h-screen">
+  <div class="flex gap-2">
+    <Button onclick={closeWidget}>Close Widget</Button>
+    <Button onclick={handleClick}>Send Message</Button>
+  </div>
 </main>
