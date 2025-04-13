@@ -54,7 +54,7 @@ class SessionSummaryResponse(BaseModel):
     Outgoing Session summary model
 
     """
-    summaries: dict
+    summaries: List[dict]
 
 class PostFilterResponse(BaseModel):
     """
@@ -128,22 +128,27 @@ async def get_posts_summary(user_session: UserSession) -> SessionSummaryResponse
     engine = create_engine(DATABASE_URI)
     session = sessionmaker(bind=engine)()
 
-    user = session.query(User).filter(User.name == user_session.user_name)
+    user = session.query(User).filter(User.name == user_session.user_name).first()
 
     results = session.query(Summary).filter(
             Summary.user_id == user.id \
-        and Summary.date_created >= datetime.datetime.now() - datetime.timedelta(hours=24))
+        and Summary.date_created >= datetime.datetime.now() - datetime.timedelta(hours=24)).all()
     
-    return results.all()
+    all_summaries = [{s.tag: {"short_summary": s.short_summary, "long_summary": s.long_summary}} for s in results]
+
+    return SessionSummaryResponse(summaries=all_summaries)
 
 @app.post("/trigger-processing")
 async def get_posts_tag(user_session: UserSession):
     engine = create_engine(DATABASE_URI)
     session = sessionmaker(bind=engine)()
 
+    print("PROCESSING NEW POSTS")
     process_new_posts(session, user_session.user_name)
+    print("PROCESSING SUMMARIES")
     process_summaries(session, user_session.user_name)
 
+    return 200
 
 
 @app.post("/post-factcheck")

@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey, ForeignKeyConstraint
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey, ForeignKeyConstraint, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from datetime import datetime
@@ -40,7 +40,11 @@ class Tag(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     last_access = Column(DateTime, nullable=False)
-    tag = Column(String, nullable=False)
+    tag = Column(String, nullable=False, unique=True)
+
+    __table_args__ = (
+        UniqueConstraint('user_id', 'tag', name='uix_user_id_tag'),
+    )
     
     user = relationship("User", back_populates="tags")
     posts = relationship("Post", secondary="post_tags", back_populates="tags")

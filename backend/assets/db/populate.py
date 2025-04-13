@@ -62,56 +62,56 @@ def populate() -> None:
         )
     ]
 
-    tags = [
-        Tag(
-            user_id=1,
-            last_access=datetime(2025, 4, 12, 12, 0, 0),
-            tag="tech"
-        ),
-        Tag(
-            user_id=1,
-            last_access=datetime(2025, 4, 12, 12, 0, 0),
-            tag="smartphones"
-        )
-    ]
+    # tags = [
+    #     Tag(
+    #         user_id=1,
+    #         last_access=datetime(2025, 4, 12, 12, 0, 0),
+    #         tag="tech"
+    #     ),
+    #     Tag(
+    #         user_id=1,
+    #         last_access=datetime(2025, 4, 12, 12, 0, 0),
+    #         tag="smartphones"
+    #     )
+    # ]
 
-    post_tags = [
-        PostTag(
-            user_id=1,
-            post_id=1,
-            tag_id=1
-        ),
-        PostTag(
-            user_id=1,
-            post_id=1,
-            tag_id=2
-        ),
-        PostTag(
-            user_id=1,
-            post_id=2,
-            tag_id=1
-        ),
-        PostTag(
-            user_id=1,
-            post_id=2,
-            tag_id=2
-        ),
-        PostTag(
-            user_id=1,
-            post_id=3,
-            tag_id=1
-        ),
-        PostTag(
-            user_id=1,
-            post_id=3,
-            tag_id=2
-        )
-    ]
+    # post_tags = [
+    #     PostTag(
+    #         user_id=1,
+    #         post_id=1,
+    #         tag_id=1
+    #     ),
+    #     PostTag(
+    #         user_id=1,
+    #         post_id=1,
+    #         tag_id=2
+    #     ),
+    #     PostTag(
+    #         user_id=1,
+    #         post_id=2,
+    #         tag_id=1
+    #     ),
+    #     PostTag(
+    #         user_id=1,
+    #         post_id=2,
+    #         tag_id=2
+    #     ),
+    #     PostTag(
+    #         user_id=1,
+    #         post_id=3,
+    #         tag_id=1
+    #     ),
+    #     PostTag(
+    #         user_id=1,
+    #         post_id=3,
+    #         tag_id=2
+    #     )
+    # ]
 
     session.add_all(users)
     session.add_all(posts)
-    session.add_all(tags)
-    session.add_all(post_tags)
+    # session.add_all(tags)
+    # session.add_all(post_tags)
     session.commit()
 
     print("Database populated with sample posts.")
